@@ -1,6 +1,8 @@
-package discord.api.data.entity.connection;
+package discord.api.data.entity.connectionEntity;
 
+import discord.api.data.entity.Server;
 import discord.api.data.entity.User;
+import discord.api.data.entity.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -13,27 +15,33 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BlockRequest {
+/**
+ * User, Server 의 Association Table
+ */
+public class UserServer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "requester_id", nullable = false)
-    private User requester;
+    @JoinColumn(name = "server_id")
+    private Server server;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "blocked_id", nullable = false)
-    private User blocked;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @CreatedDate
     private LocalDateTime createdAt;
 
+    private UserStatus userStatus;
+
     @Builder
-    public BlockRequest(Long id, User requester, User blocked, LocalDateTime createdAt) {
+    public UserServer(Long id, Server server, User user, LocalDateTime createdAt, UserStatus userStatus) {
         this.id = id;
-        this.requester = requester;
-        this.blocked = blocked;
+        this.server = server;
+        this.user = user;
         this.createdAt = createdAt;
+        this.userStatus = userStatus;
     }
 }

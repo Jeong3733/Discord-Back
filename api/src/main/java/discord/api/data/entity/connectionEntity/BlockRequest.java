@@ -1,6 +1,5 @@
-package discord.api.data.entity.connection;
+package discord.api.data.entity.connectionEntity;
 
-import discord.api.data.entity.Server;
 import discord.api.data.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -14,27 +13,30 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserServer {
+/**
+ * User, User 의 Association Table (사용자간의 차단 여부)
+ */
+public class BlockRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "server_id")
-    private Server server;
+    @JoinColumn(name = "requester_id", nullable = false)
+    private User requester;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "blocked_id", nullable = false)
+    private User blocked;
 
     @CreatedDate
     private LocalDateTime createdAt;
 
     @Builder
-    public UserServer(Long id, Server server, User user, LocalDateTime createdAt) {
+    public BlockRequest(Long id, User requester, User blocked, LocalDateTime createdAt) {
         this.id = id;
-        this.server = server;
-        this.user = user;
+        this.requester = requester;
+        this.blocked = blocked;
         this.createdAt = createdAt;
     }
 }
