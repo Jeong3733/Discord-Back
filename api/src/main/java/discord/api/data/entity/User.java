@@ -1,6 +1,7 @@
 package discord.api.data.entity;
 
 import discord.api.data.entity.base.TimeAudit;
+import discord.api.data.entity.enums.UserStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,16 +21,17 @@ public class User extends TimeAudit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String password;
     private String email;
     private boolean email_authenticated;
+    private String password;
     private UUID profile_image;
     private String profile_message;
     private String nickname;
     private LocalDateTime birth;
+    private UserStatus userStatus;
 
     @Builder
-    public User(Long id, String password, String email, boolean email_authenticated, UUID profile_image, String profile_message, String nickname, LocalDateTime birth) {
+    public User(Long id, String password, String email, boolean email_authenticated, UUID profile_image, String profile_message, String nickname, LocalDateTime birth, UserStatus userStatus) {
         this.id = id;
         this.password = password;
         this.email = email;
@@ -38,5 +40,6 @@ public class User extends TimeAudit {
         this.profile_message = profile_message;
         this.nickname = nickname;
         this.birth = birth;
+        this.userStatus = userStatus;
     }
 }
