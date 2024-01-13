@@ -1,4 +1,4 @@
-package discord.api.common.exception;
+package discord.api.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,4 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Builder
-public record ErrorDto(String code, String message) {}
+public class ErrorDto {
+    private final String code;
+    private final String message;
+}
