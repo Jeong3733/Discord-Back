@@ -1,4 +1,4 @@
-package discord.api.data.entity.enums;
+package discord.api.entity.enums;
 
 public enum FriendshipStatus {
     // 친구 요청 대기

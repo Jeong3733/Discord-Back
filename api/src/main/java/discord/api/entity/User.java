@@ -1,7 +1,7 @@
-package discord.api.data.entity;
+package discord.api.entity;
 
-import discord.api.data.entity.base.TimeAudit;
-import discord.api.data.entity.enums.UserStatus;
+import discord.api.entity.base.TimeAudit;
+import discord.api.entity.enums.UserStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

@@ -1,21 +1,22 @@
-package discord.api.data.entity.connectionEntity;
+package discord.api.entity.connectionEntity;
 
-import discord.api.data.entity.base.TimeAudit;
-import discord.api.data.entity.User;
-import discord.api.data.entity.enums.FriendshipStatus;
+import discord.api.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 /**
- * User, User 의 Association Table (사용자 간의 친구 추가 여부)
+ * User, User 의 Association Table (사용자간의 차단 여부)
  */
-public class FriendshipRequest extends TimeAudit {
+public class BlockRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,14 +29,14 @@ public class FriendshipRequest extends TimeAudit {
     @JoinColumn(name = "blocked_id", nullable = false)
     private User blocked;
 
-    @Builder.Default
-    private FriendshipStatus status = FriendshipStatus.PENDING;
+    @CreatedDate
+    private LocalDateTime createdAt;
 
     @Builder
-    public FriendshipRequest(Long id, User requester, User blocked, FriendshipStatus status) {
+    public BlockRequest(Long id, User requester, User blocked, LocalDateTime createdAt) {
         this.id = id;
         this.requester = requester;
         this.blocked = blocked;
-        this.status = status;
+        this.createdAt = createdAt;
     }
 }

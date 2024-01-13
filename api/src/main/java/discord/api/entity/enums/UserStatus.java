@@ -1,4 +1,4 @@
-package discord.api.data.entity.enums;
+package discord.api.entity.enums;
 
 public enum UserStatus {
     ONLINE,

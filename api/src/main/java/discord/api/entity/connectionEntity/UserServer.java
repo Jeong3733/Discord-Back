@@ -1,8 +1,8 @@
-package discord.api.data.entity.connectionEntity;
+package discord.api.entity.connectionEntity;
 
-import discord.api.data.entity.Server;
-import discord.api.data.entity.User;
-import discord.api.data.entity.enums.UserStatus;
+import discord.api.entity.Server;
+import discord.api.entity.User;
+import discord.api.entity.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

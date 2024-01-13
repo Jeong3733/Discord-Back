@@ -1,4 +1,4 @@
-package discord.api.data.entity.base;
+package discord.api.entity.base;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

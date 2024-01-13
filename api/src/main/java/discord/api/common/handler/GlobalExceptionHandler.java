@@ -1,7 +1,7 @@
 package discord.api.common.handler;
 
 import discord.api.common.enums.ErrorCode;
-import discord.api.common.exception.ErrorDto;
+import discord.api.dtos.ErrorDto;
 import discord.api.common.exception.RestApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
