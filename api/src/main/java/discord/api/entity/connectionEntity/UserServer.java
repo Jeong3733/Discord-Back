@@ -34,6 +34,8 @@ public class UserServer {
     @CreatedDate
     private LocalDateTime createdAt;
 
+    @Enumerated(EnumType.STRING)
+
     private UserStatus userStatus;
 
     @Builder

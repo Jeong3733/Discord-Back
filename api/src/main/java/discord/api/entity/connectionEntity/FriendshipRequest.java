@@ -28,5 +28,6 @@ public class FriendshipRequest extends TimeAudit {
     private User blocked;
 
     @Builder.Default
+    @Enumerated(EnumType.STRING)
     private FriendshipStatus status = FriendshipStatus.PENDING;
 }

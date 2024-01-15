@@ -1,7 +1,8 @@
-package discord.api.security;
+package discord.api.common.security.userdetails;
 
-import discord.api.common.enums.ErrorCode;
+import discord.api.common.exception.ErrorCode;
 import discord.api.common.exception.RestApiException;
+import discord.api.entity.User;
 import discord.api.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,8 +20,13 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return (UserDetails) userRepository.findByEmail(email)
+    public CustomUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RestApiException(ErrorCode.EMAIL_NOT_FOUND));
+
+        if (user != null)
+            return new CustomUserDetails(user);
+
+        return null;
     }
 }
