@@ -1,6 +1,6 @@
-package discord.api.data.entity.connection;
+package discord.api.entity.connectionEntity;
 
-import discord.api.data.entity.User;
+import discord.api.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -13,6 +13,9 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+/**
+ * User, User 의 Association Table (사용자간의 차단 여부)
+ */
 public class BlockRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

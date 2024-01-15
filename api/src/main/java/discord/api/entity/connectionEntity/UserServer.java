@@ -1,7 +1,8 @@
-package discord.api.data.entity.connection;
+package discord.api.entity.connectionEntity;
 
-import discord.api.data.entity.Server;
-import discord.api.data.entity.User;
+import discord.api.entity.Server;
+import discord.api.entity.User;
+import discord.api.entity.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -14,6 +15,9 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+/**
+ * User, Server 의 Association Table
+ */
 public class UserServer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,11 +34,16 @@ public class UserServer {
     @CreatedDate
     private LocalDateTime createdAt;
 
+    @Enumerated(EnumType.STRING)
+
+    private UserStatus userStatus;
+
     @Builder
-    public UserServer(Long id, Server server, User user, LocalDateTime createdAt) {
+    public UserServer(Long id, Server server, User user, LocalDateTime createdAt, UserStatus userStatus) {
         this.id = id;
         this.server = server;
         this.user = user;
         this.createdAt = createdAt;
+        this.userStatus = userStatus;
     }
 }

@@ -1,6 +1,6 @@
-package discord.api.data.entity;
+package discord.api.entity;
 
-import discord.api.data.entity.base.TimeAudit;
+import discord.api.entity.base.TimeAudit;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

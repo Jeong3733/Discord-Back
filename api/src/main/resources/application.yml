@@ -1,6 +1,17 @@
 spring:
+  config:
+    import:
+      - app.yml
+
   profiles:
     active: local
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      repositories:
+        enabled: false
 
   datasource:
     url: jdbc:mysql://localhost:3306/discord?serverTimezone=UTC&characterEncoding=UTF-8
@@ -10,12 +21,12 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         # show_sql: true
         format_sql: true
-        use_sql_comments: true # QueryDsl ? ??? ?, ??? JPQL ? ?? ?? ??
+        use_sql_comments: true
 
 logging.level:
   org.hibernate.SQL: debug

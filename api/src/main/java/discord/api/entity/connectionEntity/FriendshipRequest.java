@@ -1,16 +1,19 @@
-package discord.api.data.entity.connection;
+package discord.api.entity.connectionEntity;
 
-import discord.api.data.entity.base.TimeAudit;
-import discord.api.data.entity.User;
+import discord.api.entity.base.TimeAudit;
+import discord.api.entity.User;
+import discord.api.entity.enums.FriendshipStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+/**
+ * User, User 의 Association Table (사용자 간의 친구 추가 여부)
+ */
 public class FriendshipRequest extends TimeAudit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,13 +28,6 @@ public class FriendshipRequest extends TimeAudit {
     private User blocked;
 
     @Builder.Default
+    @Enumerated(EnumType.STRING)
     private FriendshipStatus status = FriendshipStatus.PENDING;
-
-    @Builder
-    public FriendshipRequest(Long id, User requester, User blocked, FriendshipStatus status) {
-        this.id = id;
-        this.requester = requester;
-        this.blocked = blocked;
-        this.status = status;
-    }
 }

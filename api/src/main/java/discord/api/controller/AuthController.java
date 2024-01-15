@@ -1,0 +1,93 @@
+package discord.api.controller;
+
+import discord.api.common.exception.ErrorCode;
+import discord.api.common.exception.JwtException;
+import discord.api.entity.dtos.LoginRequestDto;
+import discord.api.entity.dtos.SignUpRequestDto;
+import discord.api.entity.dtos.TokenResponseDto;
+import discord.api.service.AuthService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+
+@Slf4j
+@RestController
+@RequiredArgsConstructor
+public class AuthController {
+    private final AuthService authService;
+    private final AuthenticationManager authenticationManager;
+
+    @GetMapping("/test")
+    public ResponseEntity<String> authenticationTest(Authentication authentication) {
+        return new ResponseEntity<>(authentication.getName(), HttpStatus.OK);
+    }
+
+    /**
+     * 회원가입
+     *
+     * @param signUpRequestDto : 회원가입 요청 정보
+     * @author Jae Wook Jeong
+     */
+    @PostMapping("/signUp")
+    public ResponseEntity<Boolean> signUp(final @RequestBody SignUpRequestDto signUpRequestDto) {
+        authService.signUp(signUpRequestDto);
+        return new ResponseEntity<>(true, HttpStatus.OK);
+    }
+
+    /**
+     * 로그인
+     *
+     * @param loginRequestDto : 로그인 요청 정보
+     * @return TokenResponseDto : Access Token, Refresh Token
+     * @author Jae Wook Jeong
+     */
+    @PostMapping("/login")
+    public ResponseEntity<TokenResponseDto> signIn(final @RequestBody LoginRequestDto loginRequestDto) {
+        String email = loginRequestDto.getEmail();
+        String password = loginRequestDto.getPassword();
+
+        authenticate(email, password);
+        TokenResponseDto tokenResponseDto = authService.generateTokens(email);
+        return new ResponseEntity<>(tokenResponseDto, HttpStatus.OK);
+    }
+
+
+    /**
+     * Access Token 이 만료되어 Refresh Token 을 이용해 재발급
+     * Filter 를 통과했으므로 Refresh Token 은 유효하다고 가정
+     * Filter 에서 SecurityContextHolder 에 저장한 Authentication 을 이용해 email 을 가져옴
+     *
+     * @param authentication : SecurityContextHolder 에 저장된 Authentication
+     * @return TokenResponseDto : Access Token & Refresh Token
+     * @author Jae Wook Jeong
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponseDto> refresh(Authentication authentication) {
+        Boolean validRefreshToken = authService.isRefreshTokenExists(authentication.getName());
+        if (validRefreshToken) {
+            TokenResponseDto tokenResponseDto = authService.generateTokens(authentication.getName());
+            return new ResponseEntity<>(tokenResponseDto, HttpStatus.OK);
+        }
+
+        throw new JwtException(ErrorCode.JWT_REFRESH_TOKEN_INVALID);
+    }
+
+    /**
+     * Login 하는 함수
+     *
+     * @param email : 사용자 이메일
+     * @param password : 사용자 비밀번호
+     * @throws org.springframework.security.core.AuthenticationException : 인증 실패 시 예외 발생
+     * @author Jae Wook Jeong
+     */
+    private void authenticate(String email, String password) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+}
