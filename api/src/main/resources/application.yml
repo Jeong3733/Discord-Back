@@ -1,7 +1,11 @@
 spring:
+  mvc:
+    favicon:
+      enabled: false
   config:
     import:
       - app.yml
+      - mail.yml
 
   profiles:
     active: local
@@ -21,7 +25,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         # show_sql: true

@@ -33,12 +33,15 @@ public class User extends TimeAudit {
 
     private Role role;
 
-    @Builder
+    public void authenticate() {
+        this.email_authenticated = true;
+    }
 
-    public User(Long id, String email, boolean email_authenticated, String password, UUID profile_image, String profile_message, String nickname, LocalDateTime birth, UserStatus userStatus, Role role) {
+    @Builder
+    public User(Long id, String email, String password, UUID profile_image, String profile_message, String nickname, LocalDateTime birth, UserStatus userStatus, Role role) {
         this.id = id;
         this.email = email;
-        this.email_authenticated = email_authenticated;
+        this.email_authenticated = false;
         this.password = password;
         this.profile_image = profile_image;
         this.profile_message = profile_message;
