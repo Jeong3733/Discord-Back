@@ -59,6 +59,14 @@ public class GlobalExceptionHandler {
         return makeResponseEntity(errorCode);
     }
 
+    @ExceptionHandler(value = {Exception.class})
+    public ResponseEntity<Object> handleServerException(Exception e) {
+        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+        log.error("handleServerException throw Exception : {}", errorCode);
+        e.printStackTrace();
+        return makeResponseEntity(errorCode);
+    }
+
     private ResponseEntity<Object> makeResponseEntity(ErrorCode errorCode) {
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .body(ErrorDto.builder()
