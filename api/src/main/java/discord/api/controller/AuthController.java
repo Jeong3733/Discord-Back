@@ -2,19 +2,26 @@ package discord.api.controller;
 
 import discord.api.common.exception.ErrorCode;
 import discord.api.common.exception.JwtException;
+import discord.api.entity.User;
+import discord.api.entity.VerificationToken;
 import discord.api.entity.dtos.LoginRequestDto;
 import discord.api.entity.dtos.SignUpRequestDto;
 import discord.api.entity.dtos.TokenResponseDto;
+import discord.api.entity.enums.VerificationTokenStatus;
 import discord.api.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @RestController
@@ -22,11 +29,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
     private final AuthenticationManager authenticationManager;
-
-    @GetMapping("/test")
-    public ResponseEntity<String> authenticationTest(Authentication authentication) {
-        return new ResponseEntity<>(authentication.getName(), HttpStatus.OK);
-    }
 
     /**
      * 회원가입
@@ -76,6 +78,31 @@ public class AuthController {
         }
 
         throw new JwtException(ErrorCode.JWT_REFRESH_TOKEN_INVALID);
+    }
+
+    /**
+     * 이메일 인증
+     * @param token : 이메일 인증 토큰
+     * @return VerificationTokenStatus : 이메일 인증 상태 (INVALID, EXPIRED, VALID)
+     *
+     * @author Jae Wook Jeong
+     */
+    @GetMapping("/verify")
+    private ResponseEntity<VerificationTokenStatus> verifyEmail(@RequestParam("token") String token) {
+        VerificationToken verificationToken = authService.getVerificationToken(token);
+
+        if (verificationToken == null)
+            return new ResponseEntity<>(VerificationTokenStatus.INVALID, HttpStatus.BAD_REQUEST);
+
+         else if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now()))
+            return new ResponseEntity<>(VerificationTokenStatus.EXPIRED, HttpStatus.BAD_REQUEST);
+
+         else {
+            User user = verificationToken.getUser();
+            authService.authenticateEmail(verificationToken.getUser());
+            System.out.println(user.getEmail());
+            return new ResponseEntity<>(VerificationTokenStatus.VALID, HttpStatus.OK);
+        }
     }
 
     /**

@@ -1,6 +1,7 @@
 app:
   jwt:
     secret: v9y$B&E)H@MbASDki(1EKDJa-NIPK!sd(Ka7w!z%C*F-JaNdRfUjXn2r5u8x/A?D(G+KbPeShVkYp
-
   cors:
     allowed-origin-list: http://localhost:3000
+  url:
+    server: http://localhost:8080
