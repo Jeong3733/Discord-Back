@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ErrorCode {
     // 400 Bad Request
-    JWT_EXCEPTION(HttpStatus.BAD_REQUEST, "4000", "JWT EXCEPTION"),
+    JWT_EXCEPTION(HttpStatus.BAD_REQUEST, "4001", "JWT EXCEPTION"),
     JWT_AUTHORIZATION_HEADER_INVALID(HttpStatus.BAD_REQUEST, "4002", "INVALID AUTHORIZATION HEADER"),
     JWT_UNSUPPORTED(HttpStatus.BAD_REQUEST, "4003", "UNSUPPORTED JWT TOKEN"),
     JWT_ILLEGAL_CLAIM(HttpStatus.BAD_REQUEST, "4004", "ILLEGAL JWT CLAIM"),
