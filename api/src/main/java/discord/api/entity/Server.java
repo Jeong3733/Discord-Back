@@ -18,13 +18,15 @@ public class Server extends TimeAudit {
     private Long id;
     private String name;
     private String description;
-    private UUID profile_image;
+
+    @Column(nullable = true)
+    private UUID profileImage;
 
     @Builder
-    public Server(Long id, String name, String description, UUID profile_image) {
+    public Server(Long id, String name, String description, UUID profileImage) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.profile_image = profile_image;
+        this.profileImage = profileImage;
     }
 }
