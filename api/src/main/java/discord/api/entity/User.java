@@ -21,7 +21,7 @@ public class User extends TimeAudit {
     private Long id;
     @Column(unique = true)
     private String email;
-    private boolean email_authenticated;
+    private boolean emailAuthenticated;
     private String password;
     private UUID profile_image;
     private String profile_message;
@@ -30,18 +30,17 @@ public class User extends TimeAudit {
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
     @Enumerated(EnumType.STRING)
-
     private Role role;
 
     public void authenticate() {
-        this.email_authenticated = true;
+        this.emailAuthenticated = true;
     }
 
     @Builder
     public User(Long id, String email, String password, UUID profile_image, String profile_message, String nickname, LocalDateTime birth, UserStatus userStatus, Role role) {
         this.id = id;
         this.email = email;
-        this.email_authenticated = false;
+        this.emailAuthenticated = false;
         this.password = password;
         this.profile_image = profile_image;
         this.profile_message = profile_message;

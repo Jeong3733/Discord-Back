@@ -1,11 +1,14 @@
 spring:
-  mvc:
-    favicon:
-      enabled: false
   config:
     import:
       - app.yml
       - mail.yml
+      - aws.yml
+
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
 
   profiles:
     active: local
@@ -18,9 +21,9 @@ spring:
         enabled: false
 
   datasource:
-    url: jdbc:mysql://discord-server.cp84w6mkcfno.ap-northeast-2.rds.amazonaws.com/discord?serverTimezone=UTC&characterEncoding=UTF-8
-    username: admin
-    password: 1q2w3e4r1Q!
+    url: jdbc:mysql://localhost:3306/discord?serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: WjdWodnr#&33
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:

@@ -66,6 +66,7 @@ public class MailService {
      *
      * @param nickname : 인증을 요청한 유저의 닉네임
      * @param verifyToken : 생성된 Verification Token 정보
+     * @return String : 인증 메일 HTML 코드
      * @author Jae Wook Jeong
      */
     private String setVerificationMail(String nickname, VerificationToken verifyToken) {
