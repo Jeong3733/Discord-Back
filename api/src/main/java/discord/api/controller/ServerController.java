@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,8 +38,12 @@ public class ServerController {
     public ResponseEntity<String> madeServer(
             @RequestPart(value = "serverImage") @Nullable MultipartFile serverImage,
             @RequestPart(value = "serverInfo") AddServerDto addServerDto,
-            @RequestPart(value = "friendList") @Nullable List<String> emailList)
+            @RequestPart(value = "friendList") @Nullable List<String> emailList,
+            Authentication authentication)
             throws IOException {
+
+        String email = authentication.getName();
+        emailList.add(email);
 
         UUID uuid = null;
         if (serverImage != null && !serverImage.isEmpty()) {

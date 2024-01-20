@@ -15,6 +15,7 @@ import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -36,6 +37,7 @@ public class ServerService {
      * @param emailList : 서버에 초대할 유저의 이메일 리스트
      * @author Jae Wook Jeong
      */
+    @Transactional
     public void addServer(AddServerDto addServerDto, @Nullable UUID uuid, List<String> emailList) {
         Server server = Server.builder()
                 .name(addServerDto.getName())

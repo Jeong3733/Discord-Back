@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -32,6 +33,7 @@ public class AwsService {
      * @return UUID : S3에 업로드된 파일의 UUID
      * @author Jae Wook Jeong
      */
+    @Transactional
     public UUID uploadMultipartFile(MultipartFile file) throws AmazonS3Exception, IOException {
         UUID uuid = UUID.randomUUID();
 
