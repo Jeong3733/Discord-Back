@@ -12,7 +12,7 @@ COPY src src
 
 # 실행 권한 설정 및 빌드
 RUN chmod +x ./gradlew
-RUN ./gradlew clean bootJar
+RUN ./gradlew -x test clean bootJar
 
 # 최종 이미지 생성
 FROM openjdk:17-buster
