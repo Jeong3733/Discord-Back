@@ -13,9 +13,12 @@ public class VerificationToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String token;
+
     @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY)
     private User user;
+
     private LocalDateTime expiryDate;
 
     private LocalDateTime calculateExpiryDate() {

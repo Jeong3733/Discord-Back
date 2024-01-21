@@ -9,6 +9,7 @@ import discord.api.entity.dtos.SignUpRequestDto;
 import discord.api.entity.dtos.TokenResponseDto;
 import discord.api.entity.enums.VerificationTokenStatus;
 import discord.api.service.AuthService;
+import discord.api.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -28,6 +29,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
+    private final UserService userService;
     private final AuthenticationManager authenticationManager;
 
     /**
@@ -54,10 +56,10 @@ public class AuthController {
         String email = loginRequestDto.getEmail();
         String password = loginRequestDto.getPassword();
 
-        User user = authService.getUserByEmail(email);
+        User user = userService.getUserByEmail(email);
         Long id = user.getId();
 
-        authenticate(email, password);
+        authenticate(id, password);
         TokenResponseDto tokenResponseDto = authService.generateTokens(id);
         return new ResponseEntity<>(tokenResponseDto, HttpStatus.OK);
     }
@@ -111,13 +113,13 @@ public class AuthController {
     /**
      * Login 하는 함수
      *
-     * @param email : 사용자 이메일
+     * @param id : 사용자 pk
      * @param password : 사용자 비밀번호
      * @throws org.springframework.security.core.AuthenticationException : 인증 실패 시 예외 발생
      * @author Jae Wook Jeong
      */
-    private void authenticate(String email, String password) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+    private void authenticate(Long id, String password) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(String.valueOf(id), password));
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

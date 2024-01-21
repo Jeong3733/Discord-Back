@@ -19,9 +19,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public CustomUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RestApiException(ErrorCode.EMAIL_NOT_FOUND));
+    public CustomUserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
+        User user = userRepository.findById(Long.parseLong(id))
+                .orElseThrow(() -> new RestApiException(ErrorCode.USER_NOT_FOUND));
 
         if (user != null)
             return new CustomUserDetails(user);

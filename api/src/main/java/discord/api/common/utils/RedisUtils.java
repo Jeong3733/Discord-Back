@@ -11,17 +11,17 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisUtils {
     private final RedisTemplate<String, String> redisTemplate;
-    public void setRefreshToken(String email, String refreshToken) {
+    public void setRefreshToken(Long id, String refreshToken) {
         // Redis 에 저장 - 만료 시간 설정을 통해 자동 삭제 처리
         redisTemplate.opsForValue().set(
-                email,
+                String.valueOf(id),
                 refreshToken,
                 GlobalConstant.REFRESH_EXP_TIME,
                 TimeUnit.MILLISECONDS
         );
     }
 
-    public String getRefreshToken(String email) {
-        return redisTemplate.opsForValue().get(email);
+    public String getRefreshToken(Long id) {
+        return redisTemplate.opsForValue().get(id);
     }
 }

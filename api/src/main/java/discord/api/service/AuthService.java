@@ -143,38 +143,6 @@ public class AuthService {
     }
 
     /**
-     * 이메일로 User 정보 가져오기
-     *
-     * @param email : 사용자 이메일
-     * @return User : 사용자 정보
-     * @throws RestApiException : 해당하는 이메일에 사용자가 존재하지 않을 시 예외 발생
-     * @author Jae Wook Jeong
-     */
-    @Transactional
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> {
-                    throw new RestApiException(ErrorCode.EMAIL_NOT_FOUND);
-                });
-    }
-
-    /**
-     * id로 User 정보 가져오기
-     *
-     * @param id : 사용자 id
-     * @return User : 사용자 정보
-     * @throws RestApiException : 해당하는 id에 사용자가 존재하지 않을 시 예외 발생
-     * @author Jae Wook Jeong
-     */
-    @Transactional
-    public User getUserById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> {
-                    throw new RestApiException(ErrorCode.USER_NOT_FOUND);
-                });
-    }
-
-    /**
      * 이메일 완증 완료시 사용자의 이메일 인증 상태를 인증 완료로 변경
      *
      * @param user : 사용자
