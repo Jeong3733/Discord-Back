@@ -11,17 +11,14 @@ import discord.api.entity.dtos.SignUpRequestDto;
 import discord.api.entity.dtos.TokenResponseDto;
 import discord.api.entity.enums.Role;
 import discord.api.entity.enums.UserStatus;
-import discord.api.repository.UserRepository;
-import discord.api.repository.VerificationTokenRepository;
+import discord.api.repository.User.UserRepository;
+import discord.api.repository.VerificatioToken.VerificationTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -69,16 +66,16 @@ public class AuthService {
     /**
      * 토큰 생성 및 Redis 에 Refresh Token 저장
      *
-     * @param email : 사용자 이메일
+     * @param id : 사용자 id
      * @return TokenResponseDto : Access Token, Refresh Token
      * @author Jae Wook Jeong
      */
     @Transactional
-    public TokenResponseDto generateTokens(String email) {
-        TokenResponseDto tokenResponseDto = jwtTokenProvider.generateToken(email);
+    public TokenResponseDto generateTokens(Long id) {
+        TokenResponseDto tokenResponseDto = jwtTokenProvider.generateToken(id);
 
         // Redis 에 Refresh Token 저장
-        redisUtils.setRefreshToken(email, tokenResponseDto.getRefreshToken());
+        redisUtils.setRefreshToken(id, tokenResponseDto.getRefreshToken());
 
         return tokenResponseDto;
     }
@@ -86,13 +83,13 @@ public class AuthService {
     /**
      * 유효한 Refresh Token 이 Redis 에  존재하는지 확인
      *
-     * @param email : 사용자 이메일
+     * @param id : 사용자 id
      * @return Boolean : Refresh Token 이 존재하는지 여부 (true: 존재, false: 존재하지 않음)
      * @author Jae Wook Jeong
      */
     @Transactional
-    public Boolean isRefreshTokenExists(String email) {
-        String refreshToken = redisUtils.getRefreshToken(email);
+    public Boolean isRefreshTokenExists(Long id) {
+        String refreshToken = redisUtils.getRefreshToken(id);
 
         // Redis 에 Refresh Token 이 존재하지 않음
         // 1. 잘못된 Refresh Token 을 보냄
@@ -142,6 +139,38 @@ public class AuthService {
         return verificationTokenRepository.findByToken(token)
                 .orElseThrow(() -> {
                     throw new RestApiException(ErrorCode.VERIFICATION_TOKEN_NOT_FOUND);
+                });
+    }
+
+    /**
+     * 이메일로 User 정보 가져오기
+     *
+     * @param email : 사용자 이메일
+     * @return User : 사용자 정보
+     * @throws RestApiException : 해당하는 이메일에 사용자가 존재하지 않을 시 예외 발생
+     * @author Jae Wook Jeong
+     */
+    @Transactional
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    throw new RestApiException(ErrorCode.EMAIL_NOT_FOUND);
+                });
+    }
+
+    /**
+     * id로 User 정보 가져오기
+     *
+     * @param id : 사용자 id
+     * @return User : 사용자 정보
+     * @throws RestApiException : 해당하는 id에 사용자가 존재하지 않을 시 예외 발생
+     * @author Jae Wook Jeong
+     */
+    @Transactional
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> {
+                    throw new RestApiException(ErrorCode.USER_NOT_FOUND);
                 });
     }
 

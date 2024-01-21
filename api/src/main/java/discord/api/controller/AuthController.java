@@ -54,8 +54,11 @@ public class AuthController {
         String email = loginRequestDto.getEmail();
         String password = loginRequestDto.getPassword();
 
+        User user = authService.getUserByEmail(email);
+        Long id = user.getId();
+
         authenticate(email, password);
-        TokenResponseDto tokenResponseDto = authService.generateTokens(email);
+        TokenResponseDto tokenResponseDto = authService.generateTokens(id);
         return new ResponseEntity<>(tokenResponseDto, HttpStatus.OK);
     }
 
@@ -71,9 +74,11 @@ public class AuthController {
      */
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponseDto> refresh(Authentication authentication) {
-        Boolean validRefreshToken = authService.isRefreshTokenExists(authentication.getName());
+        long id = Long.parseLong(authentication.getName());
+        Boolean validRefreshToken = authService.isRefreshTokenExists(id);
+
         if (validRefreshToken) {
-            TokenResponseDto tokenResponseDto = authService.generateTokens(authentication.getName());
+            TokenResponseDto tokenResponseDto = authService.generateTokens(id);
             return new ResponseEntity<>(tokenResponseDto, HttpStatus.OK);
         }
 
@@ -98,9 +103,7 @@ public class AuthController {
             return new ResponseEntity<>(VerificationTokenStatus.EXPIRED, HttpStatus.BAD_REQUEST);
 
          else {
-            User user = verificationToken.getUser();
             authService.authenticateEmail(verificationToken.getUser());
-            System.out.println(user.getEmail());
             return new ResponseEntity<>(VerificationTokenStatus.VALID, HttpStatus.OK);
         }
     }

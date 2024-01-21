@@ -38,12 +38,12 @@ public class JwtTokenProvider implements InitializingBean {
     /**
      * Access 토큰 생성하는 메서드
      *
-     * @param email : 이메일
+     * @param id : 유저 id
      * @return String : 토큰
      * @throws io.jsonwebtoken.security.InvalidKeyException : 키가 유효하지 않을 때 예외 발생
      * @author Jae Wook Jeong
      */
-    public TokenResponseDto generateToken(String email) {
+    public TokenResponseDto generateToken(Long id) {
         log.info("JwtTokenProvider.generateToken() working");
 
         Date now = new Date();
@@ -51,14 +51,14 @@ public class JwtTokenProvider implements InitializingBean {
         String accessToken = Jwts.builder()
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(new Date(now.getTime() + GlobalConstant.ACCESS_EXP_TIME))
-                .setSubject(email)
+                .claim("id", id)
                 .claim("type", TokenType.ACCESS)
                 .compact();
 
         String refreshToken = Jwts.builder()
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(new Date(now.getTime() + GlobalConstant.REFRESH_EXP_TIME))
-                .setSubject(email)
+                .claim("id", id)
                 .claim("type", TokenType.REFRESH)
                 .compact();
 
