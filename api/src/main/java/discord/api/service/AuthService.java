@@ -65,6 +65,7 @@ public class AuthService {
 
     /**
      * 토큰 생성 및 Redis 에 Refresh Token 저장
+     * 이미 존재하는 Refresh Token 이 있을 경우 덮어씌움
      *
      * @param id : 사용자 id
      * @return TokenResponseDto : Access Token, Refresh Token
@@ -94,6 +95,7 @@ public class AuthService {
         // Redis 에 Refresh Token 이 존재하지 않음
         // 1. 잘못된 Refresh Token 을 보냄
         // 2. Refresh Token 이 만료됨
+        // 3. 이미 사용된 Refresh Token 을 사용함
         if (refreshToken == null)
             return false;
 
@@ -140,6 +142,33 @@ public class AuthService {
                 .orElseThrow(() -> {
                     throw new RestApiException(ErrorCode.VERIFICATION_TOKEN_NOT_FOUND);
                 });
+    }
+
+    /**
+     * 사용자 로그인 시 사용자의 상태를 온라인으로 변경
+     *
+     * @param user : 사용자
+     * @return TokenResponseDto : Access Token, Refresh Token
+     * @author Jae Wook Jeong
+     */
+    @Transactional
+    public TokenResponseDto login(User user) {
+        user.login();
+        return generateTokens(user.getId());
+    }
+
+    /**
+     * 사용자 로그아웃 시 사용자의 상태를 오프라인으로 변경
+     *
+     * @param user : 사용자
+     * @author Jae Wook Jeong
+     */
+    @Transactional
+    public void logout(User user) {
+        user.logout();
+
+        // Redis 에서 Refresh Token 삭제
+        redisUtils.deleteRefreshToken(user.getId());
     }
 
     /**

@@ -45,6 +45,14 @@ public class User extends TimeAudit {
         this.emailAuthenticated = true;
     }
 
+    public void login() {
+        this.userStatus = UserStatus.ONLINE;
+    }
+
+    public void logout() {
+        this.userStatus = UserStatus.OFFLINE;
+    }
+
     @Builder
     public User(Long id, String email, String password, UUID profile_image, String profile_message, String nickname, LocalDateTime birth, UserStatus userStatus, Role role) {
         this.id = id;

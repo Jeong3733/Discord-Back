@@ -24,4 +24,8 @@ public class RedisUtils {
     public String getRefreshToken(Long id) {
         return redisTemplate.opsForValue().get(id);
     }
+
+    public void deleteRefreshToken(Long id) {
+        redisTemplate.delete(String.valueOf(id));
+    }
 }

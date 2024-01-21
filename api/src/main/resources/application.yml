@@ -28,12 +28,23 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         # show_sql: true
         format_sql: true
         use_sql_comments: true
+
+    # for data init by sql script
+    defer-datasource-initialization: true
+
+  # for data init by sql script
+  sql:
+    init:
+      data-locations: classpath:sql/init-data.sql
+      schema-locations: classpath:sql/schema.sql
+      mode: always
+      platform: mysql
 
 logging.level:
   org.hibernate.SQL: debug

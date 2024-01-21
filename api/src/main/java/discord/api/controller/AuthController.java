@@ -58,12 +58,29 @@ public class AuthController {
 
         User user = userService.getUserByEmail(email);
         Long id = user.getId();
-
         authenticate(id, password);
-        TokenResponseDto tokenResponseDto = authService.generateTokens(id);
+
+        TokenResponseDto tokenResponseDto = authService.login(user);
+
         return new ResponseEntity<>(tokenResponseDto, HttpStatus.OK);
     }
 
+    /**
+     * 로그아웃
+     *
+     * @param authentication : SecurityContextHolder 에 저장된 Authentication
+     * @return TokenResponseDto : Access Token, Refresh Token
+     * @author Jae Wook Jeong
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<Boolean> signOut(Authentication authentication) {
+        long id = Long.parseLong(authentication.getName());
+        User user = userService.getUserById(id);
+
+        authService.logout(user);
+
+        return new ResponseEntity<>(true, HttpStatus.OK);
+    }
 
     /**
      * Access Token 이 만료되어 Refresh Token 을 이용해 재발급
@@ -80,6 +97,7 @@ public class AuthController {
         Boolean validRefreshToken = authService.isRefreshTokenExists(id);
 
         if (validRefreshToken) {
+            // 이미 존재하는 Refresh Token 은 덮어 씌움
             TokenResponseDto tokenResponseDto = authService.generateTokens(id);
             return new ResponseEntity<>(tokenResponseDto, HttpStatus.OK);
         }
