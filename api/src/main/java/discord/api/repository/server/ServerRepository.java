@@ -1,4 +1,4 @@
-package discord.api.repository;
+package discord.api.repository.server;
 
 import discord.api.entity.Server;
 import org.springframework.data.jpa.repository.JpaRepository;
