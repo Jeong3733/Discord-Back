@@ -1,0 +1,13 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/local
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/discord?serverTimezone=Asia/Seoul
+    username: root
+    password: ykbaik100!
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
