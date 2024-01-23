@@ -42,9 +42,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Authorization 토큰이 비었을 경우는 아래의 로직을 진행하지 않고 그냥 진행
             if (token != null) {
                 Claims claims = jwtTokenProvider.validateAndGetClaims(token);
-
-                String email = claims.getSubject();
-                CustomUserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+                String idString = String.valueOf(claims.get("id"));
+                CustomUserDetails userDetails = customUserDetailsService.loadUserByUsername(idString);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities()
                 );

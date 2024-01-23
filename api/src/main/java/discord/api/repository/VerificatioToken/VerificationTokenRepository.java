@@ -1,4 +1,4 @@
-package discord.api.repository;
+package discord.api.repository.VerificatioToken;
 
 import discord.api.entity.VerificationToken;
 import org.springframework.data.jpa.repository.JpaRepository;

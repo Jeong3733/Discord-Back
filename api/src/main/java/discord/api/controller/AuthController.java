@@ -9,6 +9,7 @@ import discord.api.entity.dtos.SignUpRequestDto;
 import discord.api.entity.dtos.TokenResponseDto;
 import discord.api.entity.enums.VerificationTokenStatus;
 import discord.api.service.AuthService;
+import discord.api.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -28,6 +29,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
+    private final UserService userService;
     private final AuthenticationManager authenticationManager;
 
     /**
@@ -54,11 +56,31 @@ public class AuthController {
         String email = loginRequestDto.getEmail();
         String password = loginRequestDto.getPassword();
 
-        authenticate(email, password);
-        TokenResponseDto tokenResponseDto = authService.generateTokens(email);
+        User user = userService.getUserByEmail(email);
+        Long id = user.getId();
+        authenticate(id, password);
+
+        TokenResponseDto tokenResponseDto = authService.login(user);
+
         return new ResponseEntity<>(tokenResponseDto, HttpStatus.OK);
     }
 
+    /**
+     * 로그아웃
+     *
+     * @param authentication : SecurityContextHolder 에 저장된 Authentication
+     * @return TokenResponseDto : Access Token, Refresh Token
+     * @author Jae Wook Jeong
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<Boolean> signOut(Authentication authentication) {
+        long id = Long.parseLong(authentication.getName());
+        User user = userService.getUserById(id);
+
+        authService.logout(user);
+
+        return new ResponseEntity<>(true, HttpStatus.OK);
+    }
 
     /**
      * Access Token 이 만료되어 Refresh Token 을 이용해 재발급
@@ -71,9 +93,12 @@ public class AuthController {
      */
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponseDto> refresh(Authentication authentication) {
-        Boolean validRefreshToken = authService.isRefreshTokenExists(authentication.getName());
+        long id = Long.parseLong(authentication.getName());
+        Boolean validRefreshToken = authService.isRefreshTokenExists(id);
+
         if (validRefreshToken) {
-            TokenResponseDto tokenResponseDto = authService.generateTokens(authentication.getName());
+            // 이미 존재하는 Refresh Token 은 덮어 씌움
+            TokenResponseDto tokenResponseDto = authService.generateTokens(id);
             return new ResponseEntity<>(tokenResponseDto, HttpStatus.OK);
         }
 
@@ -98,9 +123,7 @@ public class AuthController {
             return new ResponseEntity<>(VerificationTokenStatus.EXPIRED, HttpStatus.BAD_REQUEST);
 
          else {
-            User user = verificationToken.getUser();
             authService.authenticateEmail(verificationToken.getUser());
-            System.out.println(user.getEmail());
             return new ResponseEntity<>(VerificationTokenStatus.VALID, HttpStatus.OK);
         }
     }
@@ -108,13 +131,13 @@ public class AuthController {
     /**
      * Login 하는 함수
      *
-     * @param email : 사용자 이메일
+     * @param id : 사용자 pk
      * @param password : 사용자 비밀번호
      * @throws org.springframework.security.core.AuthenticationException : 인증 실패 시 예외 발생
      * @author Jae Wook Jeong
      */
-    private void authenticate(String email, String password) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+    private void authenticate(Long id, String password) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(String.valueOf(id), password));
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

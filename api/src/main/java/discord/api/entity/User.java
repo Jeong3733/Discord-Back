@@ -19,21 +19,38 @@ public class User extends TimeAudit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(unique = true)
     private String email;
+
     private boolean emailAuthenticated;
+
     private String password;
+
     private UUID profile_image;
+
     private String profile_message;
+
     private String nickname;
+
     private LocalDateTime birth;
+
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
     public void authenticate() {
         this.emailAuthenticated = true;
+    }
+
+    public void login() {
+        this.userStatus = UserStatus.ONLINE;
+    }
+
+    public void logout() {
+        this.userStatus = UserStatus.OFFLINE;
     }
 
     @Builder
