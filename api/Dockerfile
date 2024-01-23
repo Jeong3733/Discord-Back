@@ -16,6 +16,10 @@ RUN ./gradlew -x test clean bootJar
 
 # 최종 이미지 생성
 FROM openjdk:17-buster
+
+# 환경 변수 배포 환경으로 설정
+ENV SPRING_PROFILES_ACTIVE = prod
+
 COPY --from=builder build/libs/*.jar app.jar
 
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}", "-jar", "/app.jar"]

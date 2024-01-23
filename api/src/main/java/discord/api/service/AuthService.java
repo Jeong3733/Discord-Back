@@ -16,7 +16,6 @@ import discord.api.repository.VerificatioToken.VerificationTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -167,7 +166,7 @@ public class AuthService {
     @Transactional
     public void logout(User user) {
         user.logout();
-        SecurityContextHolder.getContext().setAuthentication(null);
+
         // Redis 에서 Refresh Token 삭제
         redisUtils.deleteRefreshToken(user.getId());
     }
