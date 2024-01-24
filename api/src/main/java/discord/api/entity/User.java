@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -33,7 +34,7 @@ public class User extends TimeAudit {
 
     private String nickname;
 
-    private LocalDateTime birth;
+    private LocalDate birth;
 
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
@@ -54,7 +55,7 @@ public class User extends TimeAudit {
     }
 
     @Builder
-    public User(Long id, String email, String password, UUID profile_image, String profile_message, String nickname, LocalDateTime birth, UserStatus userStatus, Role role) {
+    public User(Long id, String email, String password, UUID profile_image, String profile_message, String nickname, LocalDate birth, UserStatus userStatus, Role role) {
         this.id = id;
         this.email = email;
         this.emailAuthenticated = false;
