@@ -8,5 +8,8 @@ public enum FriendshipStatus {
     ACCEPTED,
 
     // 친구 요청 거절
-    DECLINED
+    DECLINED,
+
+    // 차단
+    BLOCKED
 }
