@@ -142,7 +142,7 @@ public class FriendService {
                 .peek(friendInfoDto -> {
                     UUID uuid = friendInfoDto.getProfileImageId();
 
-                    String profileImage = profileImageMap.get(friendInfoDto.getProfileImageId()) != null ?
+                    String profileImage = profileImageMap.get(uuid) != null ?
                             Base64.getEncoder().encodeToString(profileImageMap.get(uuid)) : null;
 
                     friendInfoDto.profileImage(profileImage);

@@ -75,8 +75,8 @@ public class ServerService {
         List<Server> serverList = serverRepositoryCustom.getServerListByUserId(userId);
 
         List<S3Object> s3ObjectList = serverList.stream()
-                .filter(Objects::nonNull)
                 .map(Server::getProfileImage)
+                .filter(Objects::nonNull)
                 .map(awsService::downloadMultipartFile)
                 .toList();
 
@@ -85,7 +85,9 @@ public class ServerService {
         return serverList.stream()
                 .map(server -> {
                     UUID uuid = server.getProfileImage();
-                    String profileImage = Base64.getEncoder().encodeToString(profileImageMap.get(uuid));
+
+                    String profileImage = profileImageMap.get(uuid) != null ?
+                            Base64.getEncoder().encodeToString(profileImageMap.get(uuid)) : null;
 
                     return ServerDto.builder()
                             .id(server.getId())
