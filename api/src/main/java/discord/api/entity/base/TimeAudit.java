@@ -20,4 +20,8 @@ public class TimeAudit {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    public void update() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

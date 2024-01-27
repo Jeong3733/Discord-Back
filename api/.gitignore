@@ -41,6 +41,7 @@ app.yml
 mail.yml
 application.yml
 application-prod.yml
+application-test.yml
 application-dev.yml
 aws.yml
 

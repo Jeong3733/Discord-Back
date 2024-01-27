@@ -1,4 +1,4 @@
-package discord.api.entity.dtos;
+package discord.api.entity.dtos.auth;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
