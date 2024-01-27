@@ -1,8 +1,9 @@
-package discord.api.entity.dtos;
+package discord.api.entity.dtos.auth;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -11,5 +12,5 @@ public class SignUpRequestDto {
     private String email;
     private String password;
     private String nickname;
-    private LocalDateTime birth;
+    private LocalDate birth;
 }

@@ -1,16 +1,15 @@
 package discord.api.controller;
 
+import discord.api.common.utils.AuthUtils;
 import discord.api.entity.User;
-import discord.api.entity.connectionEntity.UserServer;
-import discord.api.entity.dtos.AddServerDto;
-import discord.api.entity.dtos.ServerDto;
+import discord.api.entity.dtos.server.AddServerDto;
+import discord.api.entity.dtos.server.ServerDto;
 import discord.api.service.AwsService;
 import discord.api.service.ServerService;
 import discord.api.service.UserService;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -29,6 +28,7 @@ public class ServerController {
     private final ServerService serverService;
     private final UserService userService;
     private final AwsService awsService;
+    private final AuthUtils authUtils;
 
     /**
      * 서버 저장
@@ -42,21 +42,15 @@ public class ServerController {
      */
     @PostMapping(value = "/server", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> madeServer(
-            @RequestPart(value = "serverImage") @Nullable MultipartFile serverImage,
-            @RequestPart(value = "serverInfo") AddServerDto addServerDto,
-            @RequestPart(value = "friendList") @Nullable List<String> emailList,
+            @RequestPart(value = "serverImage") @Nullable final MultipartFile serverImage,
+            @RequestPart(value = "serverInfo") final AddServerDto addServerDto,
+            @RequestPart(value = "friendList") @Nullable final List<String> emailList,
             Authentication authentication)
             throws IOException {
 
-        System.out.println(authentication.getName());
+        User user = authUtils.getUserFromAuthentication(authentication);
 
-        Long userId = Long.parseLong(authentication.getName());
-
-        System.out.println(userId);
-
-        String email = userService.getUserById(userId)
-                .getEmail();
-
+        String email = user.getEmail();
         emailList.add(email);
 
         UUID uuid = null;
@@ -65,7 +59,9 @@ public class ServerController {
         }
 
         serverService.addServer(addServerDto, uuid, emailList);
-        return new ResponseEntity<>(uuid != null ? uuid.toString() : null, HttpStatus.OK);
+        return ResponseEntity
+                .ok()
+                .body(uuid != null ? uuid.toString() : null);
     }
 
     /**
@@ -77,13 +73,16 @@ public class ServerController {
      */
     @PostMapping("/list/server")
     public ResponseEntity<HashMap<String, List<ServerDto>>> getServerList(Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        User user = authUtils.getUserFromAuthentication(authentication);
+        Long userId = user.getId();
 
         List<ServerDto> serverDtoList = serverService.getServerList(userId);
 
         HashMap<String, List<ServerDto>> serverDtoListMap = new HashMap<>();
         serverDtoListMap.put("serverList", serverDtoList);
 
-        return new ResponseEntity<>(serverDtoListMap, HttpStatus.OK);
+        return ResponseEntity
+                .ok()
+                .body(serverDtoListMap);
     }
 }

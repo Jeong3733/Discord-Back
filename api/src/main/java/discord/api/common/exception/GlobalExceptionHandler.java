@@ -1,6 +1,6 @@
 package discord.api.common.exception;
 
-import discord.api.entity.dtos.ErrorDto;
+import discord.api.entity.dtos.common.ErrorDto;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;

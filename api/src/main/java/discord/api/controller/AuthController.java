@@ -2,24 +2,20 @@ package discord.api.controller;
 
 import discord.api.common.exception.ErrorCode;
 import discord.api.common.exception.JwtException;
+import discord.api.common.utils.AuthUtils;
 import discord.api.entity.User;
 import discord.api.entity.VerificationToken;
-import discord.api.entity.dtos.LoginRequestDto;
-import discord.api.entity.dtos.SignUpRequestDto;
-import discord.api.entity.dtos.TokenResponseDto;
+import discord.api.entity.dtos.auth.LoginRequestDto;
+import discord.api.entity.dtos.auth.SignUpRequestDto;
+import discord.api.entity.dtos.auth.TokenResponseDto;
 import discord.api.entity.enums.VerificationTokenStatus;
 import discord.api.service.AuthService;
 import discord.api.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -30,7 +26,7 @@ import java.time.LocalDateTime;
 public class AuthController {
     private final AuthService authService;
     private final UserService userService;
-    private final AuthenticationManager authenticationManager;
+    private final AuthUtils authUtils;
 
     /**
      * 회원가입
@@ -41,7 +37,10 @@ public class AuthController {
     @PostMapping("/signUp")
     public ResponseEntity<Boolean> signUp(final @RequestBody SignUpRequestDto signUpRequestDto) {
         authService.signUp(signUpRequestDto);
-        return new ResponseEntity<>(true, HttpStatus.OK);
+
+        return ResponseEntity
+                .ok()
+                .body(true);
     }
 
     /**
@@ -58,11 +57,13 @@ public class AuthController {
 
         User user = userService.getUserByEmail(email);
         Long id = user.getId();
-        authenticate(id, password);
+        authUtils.authenticate(id, password);
 
         TokenResponseDto tokenResponseDto = authService.login(user);
 
-        return new ResponseEntity<>(tokenResponseDto, HttpStatus.OK);
+        return ResponseEntity
+                .ok()
+                .body(tokenResponseDto);
     }
 
     /**
@@ -74,12 +75,13 @@ public class AuthController {
      */
     @PostMapping("/logout")
     public ResponseEntity<Boolean> signOut(Authentication authentication) {
-        long id = Long.parseLong(authentication.getName());
-        User user = userService.getUserById(id);
+        User user = authUtils.getUserFromAuthentication(authentication);
 
         authService.logout(user);
 
-        return new ResponseEntity<>(true, HttpStatus.OK);
+        return ResponseEntity
+                .ok()
+                .body(true);
     }
 
     /**
@@ -93,13 +95,17 @@ public class AuthController {
      */
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponseDto> refresh(Authentication authentication) {
-        long id = Long.parseLong(authentication.getName());
+        User user = authUtils.getUserFromAuthentication(authentication);
+
+        long id = user.getId();
         Boolean validRefreshToken = authService.isRefreshTokenExists(id);
 
         if (validRefreshToken) {
             // 이미 존재하는 Refresh Token 은 덮어 씌움
             TokenResponseDto tokenResponseDto = authService.generateTokens(id);
-            return new ResponseEntity<>(tokenResponseDto, HttpStatus.OK);
+            return ResponseEntity
+                    .ok()
+                    .body(tokenResponseDto);
         }
 
         throw new JwtException(ErrorCode.JWT_REFRESH_TOKEN_INVALID);
@@ -112,32 +118,22 @@ public class AuthController {
      *
      * @author Jae Wook Jeong
      */
+    // TODO : 3개 경우의 수에 따라서 다르게 리다이랙트 시키기
     @GetMapping("/verify")
-    private ResponseEntity<VerificationTokenStatus> verifyEmail(@RequestParam("token") String token) {
+    private ResponseEntity<VerificationTokenStatus> verifyEmail(final @RequestParam("token") String token) {
         VerificationToken verificationToken = authService.getVerificationToken(token);
 
-        if (verificationToken == null)
+        if (verificationToken == null) {
             return new ResponseEntity<>(VerificationTokenStatus.INVALID, HttpStatus.BAD_REQUEST);
+        }
 
-         else if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now()))
+         else if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             return new ResponseEntity<>(VerificationTokenStatus.EXPIRED, HttpStatus.BAD_REQUEST);
+        }
 
          else {
             authService.authenticateEmail(verificationToken.getUser());
             return new ResponseEntity<>(VerificationTokenStatus.VALID, HttpStatus.OK);
         }
-    }
-
-    /**
-     * Login 하는 함수
-     *
-     * @param id : 사용자 pk
-     * @param password : 사용자 비밀번호
-     * @throws org.springframework.security.core.AuthenticationException : 인증 실패 시 예외 발생
-     * @author Jae Wook Jeong
-     */
-    private void authenticate(Long id, String password) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(String.valueOf(id), password));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

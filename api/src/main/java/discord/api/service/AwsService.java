@@ -62,25 +62,18 @@ public class AwsService {
     }
 
     /**
-     * S3에서 uuid list를 통해서 파일 다운로드
+     * S3에서 uuid 를 통해서 파일 다운로드
      *
-     * @param uuidList : 다운로드할 파일의 UUID 리스트
-     * @return s3ObjectList : S3에서 다운로드한 파일 리스트
+     * @param uuid : 다운로드할 파일의 UUID
+     * @return S3Object : S3에서 다운로드한 파일 리스트
      * @throws AmazonS3Exception : S3에서 파일 다운로드 실패 시 예외 발생
      * @author Jae Wook Jeong
      */
-    public List<S3Object> downloadMultipartFileList(List<UUID> uuidList) throws AmazonS3Exception {
-        List<S3Object> s3ObjectList = new ArrayList<>();
-
-        for (UUID uuid : uuidList) {
-            try {
-                S3Object s3Object = amazonS3.getObject(bucket, uuid.toString());
-                s3ObjectList.add(s3Object);
-            } catch (AmazonS3Exception e) {
-                throw new RestApiException(ErrorCode.AWS_S3_DOWNLOAD_FAIL);
-            }
+    public S3Object downloadMultipartFile(UUID uuid) throws AmazonS3Exception {
+        try {
+            return amazonS3.getObject(bucket, uuid.toString());
+        } catch (AmazonS3Exception e) {
+            throw new RestApiException(ErrorCode.AWS_S3_DOWNLOAD_FAIL);
         }
-
-        return s3ObjectList;
     }
 }
