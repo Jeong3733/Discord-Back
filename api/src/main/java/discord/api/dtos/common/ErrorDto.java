@@ -1,4 +1,4 @@
-package discord.api.entity.dtos.common;
+package discord.api.dtos.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -2,21 +2,17 @@ package discord.api.controller;
 
 import discord.api.common.utils.AuthUtils;
 import discord.api.entity.User;
-import discord.api.entity.dtos.auth.EmailRequestDto;
-import discord.api.entity.dtos.user.NicknameNProfileIImgDto;
+import discord.api.dtos.auth.EmailRequestDto;
+import discord.api.dtos.user.NicknameNProfileIImgDto;
 import discord.api.entity.enums.FriendshipStatus;
 import discord.api.service.FriendService;
 import groovy.util.logging.Slf4j;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.net.openssl.OpenSSLUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import javax.management.Query;
-import java.util.List;
 
 @Slf4j
 @RestController

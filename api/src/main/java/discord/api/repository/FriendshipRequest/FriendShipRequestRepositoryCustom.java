@@ -4,7 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import discord.api.entity.connectionEntity.FriendshipRequest;
-import discord.api.entity.dtos.user.NicknameNProfileIImgDto;
+import discord.api.dtos.user.NicknameNProfileIImgDto;
 import discord.api.entity.dtos.user.QNicknameNProfileIImgDto;
 import discord.api.entity.enums.FriendshipStatus;
 import lombok.RequiredArgsConstructor;

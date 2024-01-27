@@ -1,4 +1,4 @@
-package discord.api.entity.dtos.user;
+package discord.api.dtos.user;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
