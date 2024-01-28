@@ -27,26 +27,38 @@ public class ChatMessageResponseDTO {
     private boolean isUpdated;
 
     public static ChatMessageResponseDTO toDTO(final ChatMessage chatMessage, final String nickname) {
-        return ChatMessageResponseDTO.builder()
+        final ChatMessageResponseDTO chatMessageResponseDTO = ChatMessageResponseDTO.builder()
                 .id(chatMessage.getId())
                 .userId(chatMessage.getUserId())
                 .nickname(nickname)
                 .imageURL(chatMessage.getImageURL())
                 .message(chatMessage.getMessage())
                 .createdAt(chatMessage.getCreatedAt())
-                .isUpdated(chatMessage.getUpdatedAt().isEqual(chatMessage.getCreatedAt()) ? false : true)
                 .build();
+
+        chatMessageResponseDTO.setIsUpdated(chatMessage.getUpdatedAt());
+
+        return chatMessageResponseDTO;
     }
 
     public static ChatMessageResponseDTO toDTO(final ChatMessage chatMessage) {
-        return ChatMessageResponseDTO.builder()
+        final ChatMessageResponseDTO chatMessageResponseDTO = ChatMessageResponseDTO.builder()
                 .id(chatMessage.getId())
                 .userId(chatMessage.getUserId())
                 .imageURL(chatMessage.getImageURL())
                 .message(chatMessage.getMessage())
                 .createdAt(chatMessage.getCreatedAt())
-                .isUpdated(chatMessage.getUpdatedAt().isEqual(chatMessage.getCreatedAt()) ? false : true)
                 .build();
+
+        chatMessageResponseDTO.setIsUpdated(chatMessage.getUpdatedAt());
+
+        return chatMessageResponseDTO;
+    }
+
+    public void setIsUpdated(final LocalDateTime updatedAt) {
+        if(updatedAt != null && updatedAt.isAfter(createdAt)) {
+            this.isUpdated = true;
+        }
     }
 
     public void setNickname(final String nickname) {
