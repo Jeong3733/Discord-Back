@@ -1,15 +1,15 @@
 package discord.api.service;
 
 import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.IOUtils;
 import discord.api.common.exception.ErrorCode;
 import discord.api.common.exception.RestApiException;
+import discord.api.common.utils.FileUtils;
 import discord.api.entity.Server;
 import discord.api.entity.User;
 import discord.api.entity.connectionEntity.UserServer;
-import discord.api.entity.dtos.AddServerDto;
-import discord.api.entity.dtos.ServerDto;
+import discord.api.entity.dtos.server.AddServerDto;
+import discord.api.entity.dtos.server.ServerDto;
 import discord.api.entity.enums.UserStatus;
 import discord.api.repository.server.ServerRepository;
 import discord.api.repository.User.UserRepository;
@@ -30,10 +30,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ServerService {
     private final ServerRepository serverRepository;
-    private final UserRepository userRepository;
     private final UserServerRepository userServerRepository;
     private final ServerRepositoryCustom serverRepositoryCustom;
     private final AwsService awsService;
+    private final UserService userService;
+    private final FileUtils fileUtils;
 
     /**
      * 서버 저장
@@ -54,11 +55,7 @@ public class ServerService {
         serverRepository.save(server);
 
         for (String email : emailList) {
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> {
-                        log.error("ServerService.addServer()");
-                        throw new RestApiException(ErrorCode.EMAIL_NOT_FOUND);
-                    });
+            User user = userService.getUserByEmail(email);
 
             UserServer userServer = UserServer.builder()
                     .server(server)
@@ -82,23 +79,13 @@ public class ServerService {
     public List<ServerDto> getServerList(Long userId) {
         List<Server> serverList = serverRepositoryCustom.getServerListByUserId(userId);
 
-        List<UUID> uuidList = serverList.stream()
+        List<S3Object> s3ObjectList = serverList.stream()
+                .filter(Objects::nonNull)
                 .map(Server::getProfileImage)
+                .map(awsService::downloadMultipartFile)
                 .toList();
 
-        List<S3Object> profileList = awsService.downloadMultipartFileList(uuidList);
-
-        Map<UUID, byte[]> profileImageMap = profileList.stream()
-                .collect(Collectors.toMap(
-                        s3Object -> UUID.fromString(s3Object.getKey()),
-                        s3Object -> {
-                            try {
-                                return IOUtils.toByteArray(s3Object.getObjectContent());
-                            } catch (IOException e) {
-                                throw new RestApiException(ErrorCode.FILE_PROCESSING_FAIL);
-                            }
-                        }
-                ));
+        Map<UUID, byte[]> profileImageMap = fileUtils.mapS3ObjectsToByteArrays(s3ObjectList);
 
         return serverList.stream()
                 .map(server -> {
@@ -114,4 +101,6 @@ public class ServerService {
                 })
                 .toList();
     }
+
+
 }

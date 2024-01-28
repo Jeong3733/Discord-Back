@@ -10,7 +10,11 @@ import lombok.*;
 @Getter
 @Builder
 @AllArgsConstructor
+@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "friendship_request", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"sender_id", "receiver_id"})
+})
 /**
  * User, User 의 Association Table (사용자 간의 친구 추가 여부)
  */
@@ -20,14 +24,36 @@ public class FriendshipRequest extends TimeAudit {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "requester_id", nullable = false)
-    private User requester;
+    @JoinColumn(name = "sender_id", nullable = false)
+    private User sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "blocked_id", nullable = false)
-    private User blocked;
+    @JoinColumn(name = "receiver_id", nullable = false)
+    private User receiver;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
     private FriendshipStatus status = FriendshipStatus.PENDING;
+
+    public void accept() {
+        this.status = FriendshipStatus.ACCEPTED;
+    }
+
+    public void decline() {
+        this.status = FriendshipStatus.DECLINED;
+    }
+
+    public void pending() {
+        this.status = FriendshipStatus.PENDING;
+    }
+
+    public void block() {
+        this.status = FriendshipStatus.BLOCKED;
+    }
+
+    public void changeSenderReceiver() {
+        User temp = this.sender;
+        this.sender = this.receiver;
+        this.receiver = temp;
+    }
 }

@@ -1,9 +1,7 @@
 package discord.api.repository.server;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import discord.api.entity.QServer;
 import discord.api.entity.Server;
-import discord.api.entity.dtos.ServerDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

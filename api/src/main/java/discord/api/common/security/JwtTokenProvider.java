@@ -3,7 +3,7 @@ package discord.api.common.security;
 import discord.api.common.GlobalConstant;
 import discord.api.common.exception.ErrorCode;
 import discord.api.common.exception.JwtException;
-import discord.api.entity.dtos.TokenResponseDto;
+import discord.api.entity.dtos.auth.TokenResponseDto;
 import discord.api.entity.enums.TokenType;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
