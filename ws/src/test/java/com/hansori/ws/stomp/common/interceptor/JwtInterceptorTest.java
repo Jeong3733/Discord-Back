@@ -39,7 +39,6 @@ class JwtInterceptorTest {
 
             stompHeaderAccessorMockedStatic.verify(() -> StompHeaderAccessor.wrap(message), times(1));
             verify(stompHeaderAccessor, times(1)).getFirstNativeHeader(any(String.class));
-
         }
     }
 

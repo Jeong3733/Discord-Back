@@ -38,17 +38,17 @@ public class ChatController {
     }
 
     @MessageMapping("/chat/{roomId}")
-    public void message(@DestinationVariable long roomId, final ChatMessageRequestDTO message, final StompHeaderAccessor stompHeaderAccessor) {
+    public void message(@DestinationVariable final long roomId, final ChatMessageRequestDTO message, final StompHeaderAccessor stompHeaderAccessor) {
 
         log.info("message");
-        long userId = getUserIdFromToken(getAuthorizationToken(stompHeaderAccessor));
+        final long userId = getUserIdFromToken(getAuthorizationToken(stompHeaderAccessor));
         kafkaTemplate.send(KafkaConstant.TOPIC_CHAT, chatMessageService.save(message, roomId, userId));
     }
 
 
     @MessageExceptionHandler
     @SendToUser("/queue/errors")
-    public String handleException(Exception exception) {
+    public String handleException(final Exception exception) {
         exception.printStackTrace();
 
         log.error("handleException");
