@@ -4,6 +4,7 @@ import discord.api.common.utils.AuthUtils;
 import discord.api.entity.User;
 import discord.api.dtos.auth.EmailRequestDto;
 import discord.api.dtos.user.NicknameNProfileIImgDto;
+import discord.api.entity.enums.FriendshipRequestStatus;
 import discord.api.entity.enums.FriendshipStatus;
 import discord.api.service.FriendService;
 import groovy.util.logging.Slf4j;
@@ -87,7 +88,18 @@ public class FriendController {
     public ResponseEntity<Page<NicknameNProfileIImgDto>> getFriendList(final Pageable pageable, Authentication authentication) {
         User user = authUtils.getUserFromAuthentication(authentication);
         Page<NicknameNProfileIImgDto> friendNicknameNProfileList =
-                friendService.getFriendNicknameNProfileList(user.getEmail(), pageable);
+                friendService.getFriendNicknameNProfileList(user.getEmail(), FriendshipRequestStatus.BOTH, FriendshipStatus.ACCEPTED, pageable);
+
+        return ResponseEntity
+                .ok()
+                .body(friendNicknameNProfileList);
+    }
+
+    @GetMapping("/friend/request/received")
+    public ResponseEntity<Page<NicknameNProfileIImgDto>> getFriendRequestReceivedList(final Pageable pageable, Authentication authentication) {
+        User user = authUtils.getUserFromAuthentication(authentication);
+        Page<NicknameNProfileIImgDto> friendNicknameNProfileList =
+                friendService.getFriendNicknameNProfileList(user.getEmail(), FriendshipRequestStatus.RECEIVER, FriendshipStatus.PENDING, pageable);
 
         return ResponseEntity
                 .ok()

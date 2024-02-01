@@ -7,6 +7,7 @@ import discord.api.common.utils.FileUtils;
 import discord.api.entity.User;
 import discord.api.entity.connectionEntity.FriendshipRequest;
 import discord.api.dtos.user.NicknameNProfileIImgDto;
+import discord.api.entity.enums.FriendshipRequestStatus;
 import discord.api.entity.enums.FriendshipStatus;
 import discord.api.repository.FriendshipRequest.FriendShipRequestRepositoryCustom;
 import discord.api.repository.FriendshipRequest.FriendshipRequestRepository;
@@ -127,8 +128,8 @@ public class FriendService {
     }
 
     @Transactional
-    public Page<NicknameNProfileIImgDto> getFriendNicknameNProfileList(String email, Pageable pageable) {
-        Page<NicknameNProfileIImgDto> friendInfoList = friendShipRequestRepositoryCustom.getFriendInfoList(email, pageable);
+    public Page<NicknameNProfileIImgDto> getFriendNicknameNProfileList(String email, FriendshipRequestStatus friendshipRequestStatus, FriendshipStatus status, Pageable pageable) {
+        Page<NicknameNProfileIImgDto> friendInfoList = friendShipRequestRepositoryCustom.getFriendshipList(email, friendshipRequestStatus, status, pageable);
 
         List<S3Object> s3ObjectList = friendInfoList.stream()
                         .map(NicknameNProfileIImgDto::getProfileImageId)
