@@ -54,6 +54,14 @@ public class User extends TimeAudit {
         this.userStatus = UserStatus.OFFLINE;
     }
 
+    public void updateProfile(String nickname, String profile_message, UUID profile_image) {
+        this.nickname = nickname;
+        this.profile_message = profile_message;
+        this.profile_image = profile_image;
+
+        this.update();
+    }
+
     @Builder
     public User(Long id, String email, String password, UUID profile_image, String profile_message, String nickname, LocalDate birth, UserStatus userStatus, Role role) {
         this.id = id;

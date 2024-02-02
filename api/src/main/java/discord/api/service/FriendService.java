@@ -4,9 +4,9 @@ import com.amazonaws.services.s3.model.S3Object;
 import discord.api.common.exception.ErrorCode;
 import discord.api.common.exception.RestApiException;
 import discord.api.common.utils.FileUtils;
+import discord.api.dtos.user.EmailNicknameProfileDto;
 import discord.api.entity.User;
 import discord.api.entity.connectionEntity.FriendshipRequest;
-import discord.api.dtos.user.NicknameNProfileIImgDto;
 import discord.api.entity.enums.FriendshipRequestStatus;
 import discord.api.entity.enums.FriendshipStatus;
 import discord.api.repository.FriendshipRequest.FriendShipRequestRepositoryCustom;
@@ -128,18 +128,18 @@ public class FriendService {
     }
 
     @Transactional
-    public Page<NicknameNProfileIImgDto> getFriendNicknameNProfileList(String email, FriendshipRequestStatus friendshipRequestStatus, FriendshipStatus status, Pageable pageable) {
-        Page<NicknameNProfileIImgDto> friendInfoList = friendShipRequestRepositoryCustom.getFriendshipList(email, friendshipRequestStatus, status, pageable);
+    public Page<EmailNicknameProfileDto> getFriendNicknameNProfileList(String email, FriendshipRequestStatus friendshipRequestStatus, FriendshipStatus status, Pageable pageable) {
+        Page<EmailNicknameProfileDto> friendInfoList = friendShipRequestRepositoryCustom.getFriendshipList(email, friendshipRequestStatus, status, pageable);
 
         List<S3Object> s3ObjectList = friendInfoList.stream()
-                        .map(NicknameNProfileIImgDto::getProfileImageId)
+                        .map(EmailNicknameProfileDto::getProfileImageId)
                         .filter(Objects::nonNull)
                         .map(awsService::downloadMultipartFile)
                     .toList();
 
         Map<UUID, byte[]> profileImageMap = fileUtils.mapS3ObjectsToByteArrays(s3ObjectList);
 
-        List<NicknameNProfileIImgDto> updatedFriendInfoList = friendInfoList.stream()
+        List<EmailNicknameProfileDto> updatedFriendInfoList = friendInfoList.stream()
                 .peek(friendInfoDto -> {
                     UUID uuid = friendInfoDto.getProfileImageId();
 

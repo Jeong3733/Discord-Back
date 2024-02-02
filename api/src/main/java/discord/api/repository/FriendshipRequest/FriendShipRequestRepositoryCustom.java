@@ -3,9 +3,9 @@ package discord.api.repository.FriendshipRequest;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import discord.api.dtos.user.QNicknameNProfileIImgDto;
+import discord.api.dtos.user.EmailNicknameProfileDto;
+import discord.api.dtos.user.QEmailNicknameProfileDto;
 import discord.api.entity.connectionEntity.FriendshipRequest;
-import discord.api.dtos.user.NicknameNProfileIImgDto;
 import discord.api.entity.enums.FriendshipRequestStatus;
 import discord.api.entity.enums.FriendshipStatus;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +25,9 @@ import static discord.api.entity.connectionEntity.QFriendshipRequest.friendshipR
 public class FriendShipRequestRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
-    public Page<NicknameNProfileIImgDto> getFriendshipList(String email, FriendshipRequestStatus friendshipRequestStatus, FriendshipStatus status, Pageable pageable) {
-        List<NicknameNProfileIImgDto> dtoList = queryFactory
-                .select(new QNicknameNProfileIImgDto(user.nickname, user.profile_image))
+    public Page<EmailNicknameProfileDto> getFriendshipList(String email, FriendshipRequestStatus friendshipRequestStatus, FriendshipStatus status, Pageable pageable) {
+        List<EmailNicknameProfileDto> dtoList = queryFactory
+                .select(new QEmailNicknameProfileDto(user.email, user.nickname, user.profile_image, user.profile_message))
                 .from(user)
                 .leftJoin(friendshipRequest)
                 .on(friendshipRequest.sender.eq(user).or(friendshipRequest.receiver.eq(user)),
