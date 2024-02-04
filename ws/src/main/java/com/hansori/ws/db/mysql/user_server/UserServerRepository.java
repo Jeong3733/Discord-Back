@@ -14,4 +14,8 @@ public interface UserServerRepository extends JpaRepository<UserServer, Long> {
     @Query("update UserServer us set us.userStatus = :status where us.server.id = :serverId and us.user.id = :userId")
     void updateUserServer(@Param("serverId") long serverId, @Param("userId") long userId, @Param("status") UserStatus status);
 
+    @Modifying(clearAutomatically = true)
+    @Query("update UserServer us set us.userStatus = :status where us.user.id = :userId")
+    void updateUserServer(@Param("userId") long userId, @Param("status") UserStatus status);
+
 }
