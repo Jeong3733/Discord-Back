@@ -17,10 +17,15 @@ public class UserStatusFacadeService {
 
 
     @Transactional
-    public void updateStatus(final long roomId, final long userId, final UserStatus status) {
-        userRepository.updateUserStatus(userId, status);
+    public void updateUserServerStatus(final long roomId, final long userId, final UserStatus status) {
         userServerRepository.updateUserServer(roomId, userId, status);
     }
 
+    @Transactional
+    public void updateUserStatus(final long userId, final UserStatus status) {
+        userRepository.updateUserStatus(userId, status);
+        if(status == UserStatus.OFFLINE) userServerRepository.updateUserServer(userId, status);
+
+    }
 
 }
