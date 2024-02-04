@@ -37,7 +37,7 @@ class UserStatusFacadeServiceTest {
         final ArgumentCaptor<UserStatus> statusCaptor2 = ArgumentCaptor.forClass(UserStatus.class);
 
 
-        target.updateStatus(roomId, userId, status);
+        target.updateUserStatus(roomId, status);
 
         BDDMockito.then(userRepository).should(Mockito.times(1))
                 .updateUserStatus(userIdCaptor.capture(), statusCaptor1.capture());
