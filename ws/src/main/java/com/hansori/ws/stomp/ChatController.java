@@ -4,6 +4,8 @@ import com.hansori.ws.kafka.KafkaConstant;
 import com.hansori.ws.db.mongo.document.ChatMessage;
 import com.hansori.ws.stomp.dto.request.ChatMessageRequestDTO;
 import com.hansori.ws.stomp.dto.response.ChatMessageResponseDTO;
+import com.hansori.ws.stomp.dto.response.error.CustomException;
+import com.hansori.ws.stomp.dto.response.error.ErrorCode;
 import com.hansori.ws.stomp.service.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +42,6 @@ public class ChatController {
     @MessageMapping("/chat/{roomId}")
     public void message(@DestinationVariable final long roomId, final ChatMessageRequestDTO message, final StompHeaderAccessor stompHeaderAccessor) {
 
-        log.info("message");
         final long userId = getUserIdFromToken(getAuthorizationToken(stompHeaderAccessor));
         kafkaTemplate.send(KafkaConstant.TOPIC_CHAT, chatMessageService.save(message, roomId, userId));
     }
@@ -48,11 +49,9 @@ public class ChatController {
 
     @MessageExceptionHandler
     @SendToUser("/queue/errors")
-    public String handleException(final Exception exception) {
-        exception.printStackTrace();
+    public ErrorCode handleException(final CustomException customException) {
 
-        log.error("handleException");
-        return "Unknown error";
+        return customException.getErrorCode();
     }
 
 
