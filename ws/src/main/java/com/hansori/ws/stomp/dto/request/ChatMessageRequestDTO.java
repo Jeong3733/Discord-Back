@@ -29,11 +29,12 @@ public class ChatMessageRequestDTO {
 
     }
 
-    public ChatMessage toEntity(long roomId, long userId, String imageCode) {
+    public ChatMessage toEntity(long roomId, long userId, String fileName) {
         return ChatMessage.builder()
                 .message(message)
                 .userId(userId)
                 .roomId(roomId)
+                .fileName(fileName)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
