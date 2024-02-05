@@ -8,6 +8,8 @@ import discord.api.common.exception.RestApiException;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -35,6 +37,24 @@ public class FileUtils {
                             }
                         }
                 ));
+    }
+
+
+    /**
+     *
+     *
+     * @param inputStream
+     * @throws IOException : 파일 변환시 예외 발생
+     * @return
+     */
+    public static String inputStreamToBase64(final InputStream inputStream) {
+        try (inputStream){
+            final byte[] byteArray = IOUtils.toByteArray(inputStream);
+            final Base64.Encoder encoder = Base64.getEncoder();
+            return encoder.encodeToString(byteArray);
+        } catch (IOException e) {
+            throw new RestApiException(ErrorCode.FILE_PROCESSING_FAIL);
+        }
     }
 
 }
