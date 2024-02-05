@@ -1,0 +1,26 @@
+name : discord_deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Docker
+        uses: docker/setup-docker@v2
+      - name: Set Yml
+        run: |
+          mkdir - p api/src/main/resources
+          echo "${{ secrets.API_APPLICATION_PROD_YML}}" | base64 --decode > api/src/main/resources/application-prod.yml
+          echo "${{ secrets.API_APPLICATION_YML }}" | base64 --decode > api/src/main/resources/application.yml
+          echo "${{ secrets.API_APP_YML }}" | base64 --decode > api/src/main/resources/app.yml
+          echo "${{ secrets.API_AWS_YML }}" | base64 --decode > api/src/main/resources/aws.yml
+      - name: docker-compose
+        run: docker-compose up -d --build
