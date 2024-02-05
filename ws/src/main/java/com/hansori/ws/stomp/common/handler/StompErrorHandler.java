@@ -1,6 +1,5 @@
 package com.hansori.ws.stomp.common.handler;
 
-import com.hansori.ws.stomp.dto.response.error.CustomException;
 import com.hansori.ws.stomp.dto.response.error.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -28,16 +27,14 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
     public Message<byte[]> handleClientMessageProcessingError(Message<byte[]> clientMessage, Throwable ex) {
 
 
-        ex.printStackTrace();
-
         final StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.ERROR);
-        accessor.setMessage(ErrorCode.UNAUTHORIZED.getMessage());
+        accessor.setMessage(ErrorCode.USER_NOT_AUTHORIZED.getMessage());
         accessor.setLeaveMutable(true);
 
         setReceiptIdForClient(clientMessage, accessor);
 
         return MessageBuilder.createMessage(
-                ErrorCode.USER_NOT_AUTHORIZED.getMessage().getBytes(StandardCharsets.UTF_8),
+                ErrorCode.USER_NOT_AUTHORIZED.toString().getBytes(StandardCharsets.UTF_8),
                 accessor.getMessageHeaders()
         );
     }

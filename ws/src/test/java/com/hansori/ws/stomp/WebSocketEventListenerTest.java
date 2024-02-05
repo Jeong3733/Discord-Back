@@ -1,7 +1,7 @@
 package com.hansori.ws.stomp;
 
-import com.hansori.ws.db.mysql.user.User;
 import com.hansori.ws.db.mysql.user.UserStatus;
+import com.hansori.ws.stomp.common.SessionManager;
 import com.hansori.ws.stomp.common.utils.JwtUtils;
 import com.hansori.ws.stomp.common.utils.StompUtils;
 import com.hansori.ws.stomp.service.UserStatusFacadeService;
@@ -24,6 +24,9 @@ public class WebSocketEventListenerTest {
     private WebSocketEventListener target;
 
     @Mock
+    private SessionManager sessionManager;
+
+    @Mock
     private UserStatusFacadeService userStatusFacadeService;
 
     final MockedStatic<StompHeaderAccessor> stompHeaderAccessorMockedStatic = mockStatic(StompHeaderAccessor.class);
@@ -35,7 +38,6 @@ public class WebSocketEventListenerTest {
 
         jwtUtils.when(() -> JwtUtils.getUserIdFromToken(any(String.class))).thenReturn(1L);
         stompUtils.when(() -> StompUtils.getAuthorizationToken(any(StompHeaderAccessor.class))).thenReturn("token");
-        stompUtils.when(() -> StompUtils.getRoomIdFromDestination(any(String.class))).thenReturn("1");
 
     }
 
@@ -55,29 +57,29 @@ public class WebSocketEventListenerTest {
         final ArgumentCaptor<UserStatus> argumentCaptor = ArgumentCaptor.forClass(UserStatus.class);
 
         stompHeaderAccessorMockedStatic.when(() -> StompHeaderAccessor.wrap(sessionConnectEvent.getMessage())).thenReturn(stompHeaderAccessor);
-        when(stompHeaderAccessor.getDestination()).thenReturn("/topic/1");
         target.handWebSocketConnectListener(sessionConnectEvent);
 
 
-        Mockito.verify(userStatusFacadeService, Mockito.times(1)).updateStatus(any(Long.class), any(Long.class), argumentCaptor.capture());
+
+        Mockito.verify(userStatusFacadeService, Mockito.times(1)).updateUserStatus(any(Long.class), argumentCaptor.capture());
         assert(argumentCaptor.getValue().equals(UserStatus.ONLINE));
     }
 
     @Test
     void handWebSocketDisconnectListener() {
 
-        final SessionDisconnectEvent sessionConnectEvent = mock(SessionDisconnectEvent.class);
-        final StompHeaderAccessor stompHeaderAccessor = mock(StompHeaderAccessor.class);
+
+        final SessionDisconnectEvent disconnectEvent = mock(SessionDisconnectEvent.class);
         final ArgumentCaptor<UserStatus> argumentCaptor = ArgumentCaptor.forClass(UserStatus.class);
+        final StompHeaderAccessor stompHeaderAccessor = mock(StompHeaderAccessor.class);
 
+        stompHeaderAccessorMockedStatic.when(() -> StompHeaderAccessor.wrap(disconnectEvent.getMessage())).thenReturn(stompHeaderAccessor);
+        when(stompHeaderAccessor.getSessionId()).thenReturn("0");
+        when(sessionManager.get("0")).thenReturn(1L);
 
-        stompHeaderAccessorMockedStatic.when(() -> StompHeaderAccessor.wrap(sessionConnectEvent.getMessage())).thenReturn(stompHeaderAccessor);
-        when(stompHeaderAccessor.getDestination()).thenReturn("/topic/1");
+        target.handleWebSocketDisconnectListener(disconnectEvent);
 
-
-        target.handWebSocketDisconnectListener(sessionConnectEvent);
-
-        Mockito.verify(userStatusFacadeService, Mockito.times(1)).updateStatus(any(Long.class), any(Long.class), argumentCaptor.capture());
+        Mockito.verify(userStatusFacadeService, Mockito.times(1)).updateUserStatus(any(Long.class), argumentCaptor.capture());
         assert(argumentCaptor.getValue().equals(UserStatus.OFFLINE));
     }
 

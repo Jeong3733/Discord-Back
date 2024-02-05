@@ -25,7 +25,7 @@ public class ChatMessage {
     private long id;
     private long userId;
     private long roomId;
-    private String imageURL;
+    private String fileName;
     private String message;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")

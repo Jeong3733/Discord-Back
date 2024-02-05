@@ -18,7 +18,7 @@ public class ChatMessageResponseDTO {
     private long id;
     private long userId;
     private String nickname;
-    private String imageURL;
+    private String imageCode;
     private String message;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
@@ -26,12 +26,12 @@ public class ChatMessageResponseDTO {
 
     private boolean isUpdated;
 
-    public static ChatMessageResponseDTO toDTO(final ChatMessage chatMessage, final String nickname) {
+    public static ChatMessageResponseDTO toDTO(final ChatMessage chatMessage, final String nickname, final String imageCode) {
         final ChatMessageResponseDTO chatMessageResponseDTO = ChatMessageResponseDTO.builder()
                 .id(chatMessage.getId())
                 .userId(chatMessage.getUserId())
                 .nickname(nickname)
-                .imageURL(chatMessage.getImageURL())
+                .imageCode(imageCode)
                 .message(chatMessage.getMessage())
                 .createdAt(chatMessage.getCreatedAt())
                 .build();
@@ -41,11 +41,11 @@ public class ChatMessageResponseDTO {
         return chatMessageResponseDTO;
     }
 
-    public static ChatMessageResponseDTO toDTO(final ChatMessage chatMessage) {
+    public static ChatMessageResponseDTO toDTO(final ChatMessage chatMessage, final String imageCode) {
         final ChatMessageResponseDTO chatMessageResponseDTO = ChatMessageResponseDTO.builder()
                 .id(chatMessage.getId())
                 .userId(chatMessage.getUserId())
-                .imageURL(chatMessage.getImageURL())
+                .imageCode(imageCode)
                 .message(chatMessage.getMessage())
                 .createdAt(chatMessage.getCreatedAt())
                 .build();

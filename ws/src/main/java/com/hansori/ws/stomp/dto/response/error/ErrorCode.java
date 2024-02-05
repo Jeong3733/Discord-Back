@@ -4,20 +4,8 @@ import lombok.Getter;
 import lombok.ToString;
 
 @Getter
-@ToString
 public enum ErrorCode {
 
-    // Common
-    INVALID_PARAMETER(400, "Invalid Parameter"),
-    UNAUTHORIZED(401, "Unauthorized"),
-    FORBIDDEN(403, "Forbidden"),
-    NOT_FOUND(404, "Not Found"),
-    METHOD_NOT_ALLOWED(405, "Method Not Allowed"),
-    INTERNAL_SERVER_ERROR(500, "Internal Server Error"),
-    BAD_GATEWAY(502, "Bad Gateway"),
-    SERVICE_UNAVAILABLE(503, "Service Unavailable"),
-
-    // User
     USER_NOT_FOUND(1001, "User Not Found"),
     USER_ALREADY_EXIST(1002, "User Already Exist"),
     USER_NOT_MATCH(1003, "User Not Match"),
@@ -46,7 +34,11 @@ public enum ErrorCode {
     USER_NOT_SIGNED(1026, "User Not Signed"),
     USER_NOT_SIGNED_UP(1027, "User Not Signed Up"),
     USER_NOT_SIGNED_IN(1028, "User Not Signed In"),
-    USER_NOT_SIGNED_OUT(1029, "User Not Signed");
+    USER_NOT_SIGNED_OUT(1029, "User Not Signed"),
+
+    INTERNAL_SERVER_ERROR(5001, "Internal Server Error");
+
+
 
     private final int code;
     private final String message;

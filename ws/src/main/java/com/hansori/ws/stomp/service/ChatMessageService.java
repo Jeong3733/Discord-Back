@@ -6,6 +6,8 @@ import com.hansori.ws.db.mongo.auto_sequence.SequenceGenerator;
 import com.hansori.ws.db.mysql.user.UserRepository;
 import com.hansori.ws.stomp.dto.request.ChatMessageRequestDTO;
 import com.hansori.ws.stomp.dto.response.ChatMessageResponseDTO;
+import com.hansori.ws.stomp.dto.response.error.CustomException;
+import com.hansori.ws.stomp.dto.response.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -23,18 +25,18 @@ public class ChatMessageService {
 
     private final SequenceGenerator sequenceGenerator;
     private final MongoJpaRepository mongoJpaRepository;
+    private final FileService fileService;
     private final UserRepository userRepository;
 
 
     public ChatMessage save(final ChatMessageRequestDTO chatMessageRequestDTO, final long roomId, final long userId) {
 
-        final ChatMessage chatMessage;
 
-        if (chatMessageRequestDTO.getImageCode() == null) {
-            chatMessage = chatMessageRequestDTO.toEntity(roomId, userId);
-        } else {
-            chatMessage = chatMessageRequestDTO.toEntity(roomId, userId, null);
-        }
+        userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        final ChatMessage chatMessage = chatMessageRequestDTO.getImageCode() == null ?
+                chatMessageRequestDTO.toEntity(roomId, userId) :
+                chatMessageRequestDTO.toEntity(roomId, userId, fileService.uploadFile(chatMessageRequestDTO.getImageCode()));
 
         chatMessage.setId(sequenceGenerator.generateSequence(ChatMessage.SEQUENCE_NAME));
         mongoJpaRepository.save(chatMessage);
@@ -53,7 +55,12 @@ public class ChatMessageService {
                 ));
 
         return result.map(chatMessage -> {
-            ChatMessageResponseDTO chatMessageResponseDTO = ChatMessageResponseDTO.toDTO(chatMessage);
+            String imageCode = null;
+            if(chatMessage.getFileName() != null){
+                imageCode = fileService.downloadFile(chatMessage.getFileName());
+            }
+
+            ChatMessageResponseDTO chatMessageResponseDTO = ChatMessageResponseDTO.toDTO(chatMessage, imageCode);
             chatMessageResponseDTO.setNickname(nicknameMap.get(chatMessage.getUserId()));
             return chatMessageResponseDTO;
         });

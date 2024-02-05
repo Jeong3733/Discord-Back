@@ -33,7 +33,6 @@ public final class JwtUtils {
             log.error("JWT 토큰이 잘못되었습니다.");
         }
 
-        log.info("is not valid token");
         return false;
     }
 
