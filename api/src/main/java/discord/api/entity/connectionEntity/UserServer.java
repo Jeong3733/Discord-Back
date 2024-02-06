@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 /**
  * User, Server 의 Association Table
  */
+// TODO : User / Server 가 삭제되면 해당 UserServer 도 삭제되도록 cascade 설정 or https://www.inflearn.com/questions/747142 참고
 public class UserServer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

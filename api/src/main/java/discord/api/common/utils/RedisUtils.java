@@ -22,7 +22,7 @@ public class RedisUtils {
     }
 
     public String getRefreshToken(Long id) {
-        return redisTemplate.opsForValue().get(id);
+        return redisTemplate.opsForValue().get(String.valueOf(id));
     }
 
     public void deleteRefreshToken(Long id) {

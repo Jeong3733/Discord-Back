@@ -76,4 +76,13 @@ public class AwsService {
             throw new RestApiException(ErrorCode.AWS_S3_DOWNLOAD_FAIL);
         }
     }
+
+
+    public void deleteMultipartFile(UUID uuid) throws AmazonS3Exception {
+        try {
+            amazonS3.deleteObject(bucket, uuid.toString());
+        } catch (AmazonS3Exception e) {
+            throw new RestApiException(ErrorCode.AWS_S3_DOWNLOAD_FAIL);
+        }
+    }
 }

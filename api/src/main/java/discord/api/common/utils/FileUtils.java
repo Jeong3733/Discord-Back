@@ -18,13 +18,13 @@ public class FileUtils {
     /**
      * S3 object 를 바이트 배열로 변환
      *
-     * @param profileList : S3에 업로드된 파일 리스트
+     * @param fileList : S3에 업로드된 파일 리스트
      * @return Map<UUID, byte[]> : S3에 업로드된 파일의 UUID, 파일의 바이트 배열
      * @throws RestApiException : 파일 변환시 예외 발생
      * @author Jae Wook Jeong
      */
-    public Map<UUID, byte[]> mapS3ObjectsToByteArrays(List<S3Object> profileList) {
-        return profileList.stream()
+    public Map<UUID, byte[]> mapS3ObjectsToByteArrays(List<S3Object> fileList) {
+        return fileList.stream()
                 .collect(Collectors.toMap(
                         s3Object -> UUID.fromString(s3Object.getKey()),
                         s3Object -> {
@@ -37,4 +37,11 @@ public class FileUtils {
                 ));
     }
 
+    public byte[] s3ObjectToByteArray(S3Object file) {
+        try {
+            return IOUtils.toByteArray(file.getObjectContent());
+        } catch (IOException e) {
+            throw new RestApiException(ErrorCode.FILE_PROCESSING_FAIL);
+        }
+    }
 }

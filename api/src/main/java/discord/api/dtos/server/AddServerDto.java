@@ -1,4 +1,4 @@
-package discord.api.entity.dtos.server;
+package discord.api.dtos.server;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

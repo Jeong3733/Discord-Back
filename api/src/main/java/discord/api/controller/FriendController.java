@@ -1,22 +1,19 @@
 package discord.api.controller;
 
 import discord.api.common.utils.AuthUtils;
+import discord.api.dtos.user.EmailNicknameProfileDto;
 import discord.api.entity.User;
-import discord.api.entity.dtos.auth.EmailRequestDto;
-import discord.api.entity.dtos.user.NicknameNProfileIImgDto;
+import discord.api.dtos.auth.EmailRequestDto;
+import discord.api.entity.enums.FriendshipRequestStatus;
 import discord.api.entity.enums.FriendshipStatus;
 import discord.api.service.FriendService;
 import groovy.util.logging.Slf4j;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.net.openssl.OpenSSLUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import javax.management.Query;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -88,10 +85,32 @@ public class FriendController {
      * @author Jae Wook Jeong
      */
     @GetMapping("/list/friend")
-    public ResponseEntity<Page<NicknameNProfileIImgDto>> getFriendList(final Pageable pageable, Authentication authentication) {
+    public ResponseEntity<Page<EmailNicknameProfileDto>> getFriendList(final Pageable pageable, Authentication authentication) {
         User user = authUtils.getUserFromAuthentication(authentication);
-        Page<NicknameNProfileIImgDto> friendNicknameNProfileList =
-                friendService.getFriendNicknameNProfileList(user.getEmail(), pageable);
+        Page<EmailNicknameProfileDto> friendNicknameNProfileList =
+                friendService.getFriendNicknameNProfileList(user.getEmail(), FriendshipRequestStatus.BOTH, FriendshipStatus.ACCEPTED, pageable);
+
+        return ResponseEntity
+                .ok()
+                .body(friendNicknameNProfileList);
+    }
+
+    @GetMapping("/friend/request/received")
+    public ResponseEntity<Page<EmailNicknameProfileDto>> getFriendRequestReceivedList(final Pageable pageable, Authentication authentication) {
+        User user = authUtils.getUserFromAuthentication(authentication);
+        Page<EmailNicknameProfileDto> friendNicknameNProfileList =
+                friendService.getFriendNicknameNProfileList(user.getEmail(), FriendshipRequestStatus.RECEIVER, FriendshipStatus.PENDING, pageable);
+
+        return ResponseEntity
+                .ok()
+                .body(friendNicknameNProfileList);
+    }
+
+    @GetMapping("/friend/request/send")
+    public ResponseEntity<Page<EmailNicknameProfileDto>> getFriendRequestSendList(final Pageable pageable, Authentication authentication) {
+        User user = authUtils.getUserFromAuthentication(authentication);
+        Page<EmailNicknameProfileDto> friendNicknameNProfileList =
+                friendService.getFriendNicknameNProfileList(user.getEmail(), FriendshipRequestStatus.SENDER, FriendshipStatus.PENDING, pageable);
 
         return ResponseEntity
                 .ok()
