@@ -31,9 +31,6 @@ public class ChatMessageService {
 
     public ChatMessage save(final ChatMessageRequestDTO chatMessageRequestDTO, final long roomId, final long userId) {
 
-
-        userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
         final ChatMessage chatMessage = chatMessageRequestDTO.getImageCode() == null ?
                 chatMessageRequestDTO.toEntity(roomId, userId) :
                 chatMessageRequestDTO.toEntity(roomId, userId, fileService.uploadFile(chatMessageRequestDTO.getImageCode()));
@@ -43,28 +40,4 @@ public class ChatMessageService {
 
         return chatMessage;
     }
-
-
-    public Slice<ChatMessageResponseDTO> findAll(final long roomId, final long chatId) {
-        final Slice<ChatMessage> result = mongoJpaRepository.findByRoomIdAndIdLessThanOrderByCreatedAtDesc(roomId, chatId, PageRequest.ofSize(300));
-
-        final Map<Long, String> nicknameMap = userRepository.getUserListByServerId(roomId)
-                .stream().collect(Collectors.toMap(
-                        user -> (long) user[0],
-                        user -> (String) user[1]
-                ));
-
-        return result.map(chatMessage -> {
-            String imageCode = null;
-            if(chatMessage.getFileName() != null){
-                imageCode = fileService.downloadFile(chatMessage.getFileName());
-            }
-
-            ChatMessageResponseDTO chatMessageResponseDTO = ChatMessageResponseDTO.toDTO(chatMessage, imageCode);
-            chatMessageResponseDTO.setNickname(nicknameMap.get(chatMessage.getUserId()));
-            return chatMessageResponseDTO;
-        });
-
-    }
-
 }

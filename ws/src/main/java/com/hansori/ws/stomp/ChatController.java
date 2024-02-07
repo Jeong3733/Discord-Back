@@ -35,13 +35,7 @@ public class ChatController {
 
     private final ChatMessageService chatMessageService;
     private final ObjectMapper objectMapper;
-
     private final KafkaTemplate<String, ChatMessage> kafkaTemplate;
-
-    @GetMapping("/chat/{roomId}")
-    public ResponseEntity<Slice<ChatMessageResponseDTO>> getChatMessage(@PathVariable final int roomId, final long chatId) {
-        return ResponseEntity.ok(chatMessageService.findAll(roomId, chatId));
-    }
 
     @MessageMapping("/chat/{roomId}")
     public void message(@DestinationVariable final long roomId, final ChatMessageRequestDTO message, final StompHeaderAccessor stompHeaderAccessor) {
