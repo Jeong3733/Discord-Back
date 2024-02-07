@@ -3,6 +3,7 @@ package com.hansori.ws.stomp.common.config;
 import com.hansori.ws.stomp.common.interceptor.JwtInterceptor;
 import com.hansori.ws.stomp.common.handler.CustomHandshakeHandler;
 import com.hansori.ws.stomp.common.handler.StompErrorHandler;
+import com.hansori.ws.stomp.common.interceptor.SessionInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,8 +21,10 @@ import org.springframework.web.socket.server.standard.ServletServerContainerFact
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final StompErrorHandler stompErrorHandler;
-    private final JwtInterceptor jwtInterceptor;
     private final CustomHandshakeHandler customHandshakeHandler;
+
+    private final JwtInterceptor jwtInterceptor;
+    private final SessionInterceptor sessionInterceptor;
 
     /**
      *
@@ -54,21 +57,25 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(jwtInterceptor);
-
+//        registration.interceptors(jwtInterceptor);
+//        registration.interceptors(sessionInterceptor);
+        registration.interceptors(jwtInterceptor, sessionInterceptor);
     }
 
     @Bean
     public ServletServerContainerFactoryBean serverContainerFactoryBean() {
-        ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
-        // 10MB
-        container.setMaxTextMessageBufferSize(1024 * 1024 * 10);
-        container.setMaxBinaryMessageBufferSize(1024 * 1024 * 10);
+        final ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
+
+//        // 1GB
+//        container.setMaxTextMessageBufferSize(1024 * 1024 * 1024);
+//        // 1GB
+//        container.setMaxBinaryMessageBufferSize(1024 * 1024 * 1024);
 
         // 5 minutes
         // https://www.appsloveworld.com/springboot/100/2/disconnect-client-session-from-spring-websocket-stomp-server
-        container.setMaxSessionIdleTimeout(5*60*1000L);
-
+//        container.setMaxSessionIdleTimeout((long) (2.5*60*1000L));
+//        15초
+        container.setMaxSessionIdleTimeout(5*1000L);
 
         return container;
     }
