@@ -23,12 +23,12 @@ public class ChatMessageFacadeService {
     private final AwsService awsService;
 
     public Slice<ChatMessageResponseDTO> getChatMessages(final long roomId) {
-        final Slice<ChatMessage> chatMessages = chatMessageRepository.findByRoomIdOrderByCreatedAtDesc(roomId, createPageRequest());
+        final Slice<ChatMessage> chatMessages = chatMessageRepository.findByRoomIdOrderByIdDesc(roomId, createPageRequest());
         return getChatMessageResponseDTOS(roomId, chatMessages);
     }
 
     public Slice<ChatMessageResponseDTO> getMoreChatMessages(final long roomId, final long lastChatId) {
-        final Slice<ChatMessage> chatMessages = chatMessageRepository.findByRoomIdAndIdLessThanOrderByCreatedAtDesc(roomId, lastChatId, createPageRequest());
+        final Slice<ChatMessage> chatMessages = chatMessageRepository.findByRoomIdAndIdLessThanOrderByIdDesc(roomId, lastChatId, createPageRequest());
         return getChatMessageResponseDTOS(roomId, chatMessages);
     }
 
