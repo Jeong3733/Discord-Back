@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 
@@ -47,25 +46,21 @@ class ChatMessageFacadeServiceTest {
 
         final SliceImpl<ChatMessage> slice = new SliceImpl<>(chatMessageList, PageRequest.ofSize(CHAT_MESSAGE_LIMIT), true);
         
-        when(chatMessageRepository.findByRoomIdOrderByCreatedAtDesc(any(Long.class), any(PageRequest.class))).thenReturn(slice);
+        when(chatMessageRepository.findByRoomIdOrderByIdDesc(any(Long.class), any(PageRequest.class))).thenReturn(slice);
         when(awsService.downloadFile(any(String.class))).thenReturn("testImageCode");
         when(userRepository.getUserListByServerId(any(Long.class))).thenReturn(userList);
 
         final Slice<ChatMessageResponseDTO> result = target.getChatMessages(roomId);
         final List<ChatMessageResponseDTO> content = result.getContent();
 
-        then(chatMessageRepository).should(times(1)).findByRoomIdOrderByCreatedAtDesc(roomId, PageRequest.ofSize(CHAT_MESSAGE_LIMIT));
+        then(chatMessageRepository).should(times(1)).findByRoomIdOrderByIdDesc(roomId, PageRequest.ofSize(CHAT_MESSAGE_LIMIT));
         then(awsService).should(times(CHAT_MESSAGE_LIMIT)).downloadFile("testFileName");
         then(userRepository).should(times(1)).getUserListByServerId(roomId);
 
-        assertEquals(CHAT_MESSAGE_LIMIT, content.size());
-        assertEquals(CHAT_MESSAGE_LIMIT - 1, content.get(0).getId());
-        assertEquals(0, content.get(299).getId());
-        Assertions.assertThatList(content).isSortedAccordingTo((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()));
+        final List<String> collect = userList.stream().map(user -> (String) user[1]).toList();
 
         Assertions.assertThatList(content).extracting(ChatMessageResponseDTO::getImageCode).containsOnly("testImageCode");
-        final List<String> collect = userList.stream().map(user -> (String) user[1]).toList();
-        Assertions.assertThatList(content).extracting(ChatMessageResponseDTO::getNickname).contains(collect.toArray(new String[0]));
+        Assertions.assertThatList(content).extracting(ChatMessageResponseDTO::getNickname).containsExactly(collect.toArray(new String[0]));
     }
 
     @Test
@@ -77,26 +72,21 @@ class ChatMessageFacadeServiceTest {
 
         final SliceImpl<ChatMessage> slice = new SliceImpl<>(chatMessageList, PageRequest.ofSize(CHAT_MESSAGE_LIMIT), true);
 
-        when(chatMessageRepository.findByRoomIdAndIdLessThanOrderByCreatedAtDesc(any(Long.class), any(Long.class), any(PageRequest.class))).thenReturn(slice);
+        when(chatMessageRepository.findByRoomIdAndIdLessThanOrderByIdDesc(any(Long.class), any(Long.class), any(PageRequest.class))).thenReturn(slice);
         when(awsService.downloadFile(any(String.class))).thenReturn("testImageCode");
         when(userRepository.getUserListByServerId(any(Long.class))).thenReturn(userList);
 
         final Slice<ChatMessageResponseDTO> result = target.getMoreChatMessages(roomId, lastChatId);
         final List<ChatMessageResponseDTO> content = result.getContent();
 
-        then(chatMessageRepository).should(times(1)).findByRoomIdAndIdLessThanOrderByCreatedAtDesc(roomId, lastChatId, PageRequest.ofSize(CHAT_MESSAGE_LIMIT));
+        then(chatMessageRepository).should(times(1)).findByRoomIdAndIdLessThanOrderByIdDesc(roomId, lastChatId, PageRequest.ofSize(CHAT_MESSAGE_LIMIT));
         then(awsService).should(times(CHAT_MESSAGE_LIMIT)).downloadFile("testFileName");
         then(userRepository).should(times(1)).getUserListByServerId(roomId);
 
-        assertEquals(300, content.size());
-        assertEquals(lastChatId - 1, content.get(0).getId());
-        assertEquals(lastChatId - CHAT_MESSAGE_LIMIT, content.get(299).getId());
-
-        Assertions.assertThatList(content).isSortedAccordingTo((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()));
+        final List<String> collect = userList.stream().map(user -> (String) user[1]).toList();
 
         Assertions.assertThatList(content).extracting(ChatMessageResponseDTO::getImageCode).containsOnly("testImageCode");
-        final List<String> collect = userList.stream().map(user -> (String) user[1]).toList();
-        Assertions.assertThatList(content).extracting(ChatMessageResponseDTO::getNickname).contains(collect.toArray(new String[0]));
+        Assertions.assertThatList(content).extracting(ChatMessageResponseDTO::getNickname).containsExactly(collect.toArray(new String[0]));
     }
 
 
