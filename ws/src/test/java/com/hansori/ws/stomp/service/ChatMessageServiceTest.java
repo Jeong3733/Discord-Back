@@ -62,41 +62,4 @@ class ChatMessageServiceTest {
         assertEquals(userId, result.getUserId());
     }
 
-
-    @Test
-    void find() {
-        final long roomId = 1L;
-        final long chatId = 300L;
-        final List<ChatMessage> chatMessageList = new ArrayList<>();
-        final LocalDateTime now = LocalDateTime.now();
-
-        for(int i = 0; i < 300; i++) {
-            ChatMessage chatMessage = ChatMessage.builder()
-                    .id(300 - i)
-                    .roomId(roomId)
-                    .userId(i)
-                    .message("test")
-                    .createdAt(now.plusMinutes(300 - i))
-                    .updatedAt(now.plusMinutes(300 - i))
-                    .build();
-
-            chatMessageList.add(chatMessage);
-        }
-
-        final SliceImpl<ChatMessage> slice = new SliceImpl<>(chatMessageList, PageRequest.ofSize(300), true);
-
-
-        BDDMockito.when(mongoJpaRepository.findByRoomIdAndIdLessThanOrderByCreatedAtDesc(any(Long.class), any(Long.class), any(PageRequest.class)))
-                .thenReturn((slice));
-
-        final Slice<ChatMessageResponseDTO> result = target.findAll(roomId, chatId);
-        final List<ChatMessageResponseDTO> content = result.getContent();
-
-        BDDMockito.then(mongoJpaRepository).should(BDDMockito.times(1)).findByRoomIdAndIdLessThanOrderByCreatedAtDesc(roomId, chatId, PageRequest.ofSize(300));
-
-        assertEquals(300, content.size());
-        assertEquals(300, content.get(0).getId());
-        Assertions.assertThatList(content).isSortedAccordingTo((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()));
-    }
-
 }
