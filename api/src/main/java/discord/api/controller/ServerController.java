@@ -2,8 +2,8 @@ package discord.api.controller;
 
 import discord.api.common.utils.AuthUtils;
 import discord.api.entity.User;
-import discord.api.entity.dtos.server.AddServerDto;
-import discord.api.entity.dtos.server.ServerDto;
+import discord.api.dtos.server.AddServerDto;
+import discord.api.dtos.server.ServerDto;
 import discord.api.service.AwsService;
 import discord.api.service.ServerService;
 import discord.api.service.UserService;

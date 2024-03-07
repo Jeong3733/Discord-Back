@@ -74,6 +74,7 @@ public class AwsService {
         }
     }
 
+
     /**
      * S3에서 uuid 를 통해서 파일 다운로드
      *
@@ -92,5 +93,13 @@ public class AwsService {
         }
     }
 
+
+    public void deleteMultipartFile(UUID uuid) throws AmazonS3Exception {
+        try {
+            amazonS3.deleteObject(bucket, uuid.toString());
+        } catch (AmazonS3Exception e) {
+            throw new RestApiException(ErrorCode.AWS_S3_DOWNLOAD_FAIL);
+        }
+    }
 
 }

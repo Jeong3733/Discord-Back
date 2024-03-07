@@ -3,9 +3,10 @@ package discord.api.repository.FriendshipRequest;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import discord.api.dtos.user.EmailNicknameProfileDto;
+import discord.api.dtos.user.QEmailNicknameProfileDto;
 import discord.api.entity.connectionEntity.FriendshipRequest;
-import discord.api.entity.dtos.user.NicknameNProfileIImgDto;
-import discord.api.entity.dtos.user.QNicknameNProfileIImgDto;
+import discord.api.entity.enums.FriendshipRequestStatus;
 import discord.api.entity.enums.FriendshipStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,15 +25,15 @@ import static discord.api.entity.connectionEntity.QFriendshipRequest.friendshipR
 public class FriendShipRequestRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
-    public Page<NicknameNProfileIImgDto> getFriendInfoList(String email, Pageable pageable) {
-        List<NicknameNProfileIImgDto> dtoList = queryFactory
-                .select(new QNicknameNProfileIImgDto(user.nickname, user.profile_image))
+    public Page<EmailNicknameProfileDto> getFriendshipList(String email, FriendshipRequestStatus friendshipRequestStatus, FriendshipStatus status, Pageable pageable) {
+        List<EmailNicknameProfileDto> dtoList = queryFactory
+                .select(new QEmailNicknameProfileDto(user.email, user.nickname, user.profile_image, user.profile_message))
                 .from(user)
                 .leftJoin(friendshipRequest)
                 .on(friendshipRequest.sender.eq(user).or(friendshipRequest.receiver.eq(user)),
-                        friendshipRequest.sender.email.eq(email).or(friendshipRequest.receiver.email.eq(email)))
+                        friendshipRequestCondition(friendshipRequestStatus, email))
                 .where(
-                        (friendshipRequest.status.eq(FriendshipStatus.ACCEPTED)),
+                        statusEq(status),
                         (user.email.ne(email))
                 )
                 .orderBy(user.nickname.asc())
@@ -43,9 +44,11 @@ public class FriendShipRequestRepositoryCustom {
         JPAQuery<Long> countQuery = queryFactory
                 .select(user.count())
                 .from(user)
-                .leftJoin(friendshipRequest).on(user.eq(friendshipRequest.sender).or(user.eq(friendshipRequest.receiver)))
+                .leftJoin(friendshipRequest)
+                .on(friendshipRequest.sender.eq(user).or(friendshipRequest.receiver.eq(user)),
+                        friendshipRequestCondition(friendshipRequestStatus, email))
                 .where(
-                        (friendshipRequest.status.eq(FriendshipStatus.ACCEPTED)),
+                        statusEq(status),
                         (user.email.ne(email))
                 );
 
@@ -84,5 +87,14 @@ public class FriendShipRequestRepositoryCustom {
 
     private BooleanBuilder statusEq(FriendshipStatus status) {
         return nullSafeBuilder(() -> friendshipRequest.status.eq(status));
+    }
+
+    private BooleanBuilder friendshipRequestCondition(FriendshipRequestStatus friendshipRequestStatus, String email) {
+        return switch (friendshipRequestStatus) {
+            case SENDER -> nullSafeBuilder(() -> friendshipRequest.sender.email.eq(email));
+            case RECEIVER -> nullSafeBuilder(() -> friendshipRequest.receiver.email.eq(email));
+            case BOTH ->
+                    nullSafeBuilder(() -> friendshipRequest.sender.email.eq(email).or(friendshipRequest.receiver.email.eq(email)));
+        };
     }
 }

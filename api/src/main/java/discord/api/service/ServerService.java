@@ -1,18 +1,15 @@
 package discord.api.service;
 
 import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.util.IOUtils;
-import discord.api.common.exception.ErrorCode;
 import discord.api.common.exception.RestApiException;
 import discord.api.common.utils.FileUtils;
 import discord.api.entity.Server;
 import discord.api.entity.User;
 import discord.api.entity.connectionEntity.UserServer;
-import discord.api.entity.dtos.server.AddServerDto;
-import discord.api.entity.dtos.server.ServerDto;
+import discord.api.dtos.server.AddServerDto;
+import discord.api.dtos.server.ServerDto;
 import discord.api.entity.enums.UserStatus;
 import discord.api.repository.server.ServerRepository;
-import discord.api.repository.User.UserRepository;
 import discord.api.repository.UserServer.UserServerRepository;
 import discord.api.repository.server.ServerRepositoryCustom;
 import jakarta.annotation.Nullable;
@@ -21,9 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -80,8 +75,8 @@ public class ServerService {
         List<Server> serverList = serverRepositoryCustom.getServerListByUserId(userId);
 
         List<S3Object> s3ObjectList = serverList.stream()
-                .filter(Objects::nonNull)
                 .map(Server::getProfileImage)
+                .filter(Objects::nonNull)
                 .map(awsService::downloadMultipartFile)
                 .toList();
 
@@ -90,7 +85,9 @@ public class ServerService {
         return serverList.stream()
                 .map(server -> {
                     UUID uuid = server.getProfileImage();
-                    String profileImage = Base64.getEncoder().encodeToString(profileImageMap.get(uuid));
+
+                    String profileImage = profileImageMap.get(uuid) != null ?
+                            Base64.getEncoder().encodeToString(profileImageMap.get(uuid)) : null;
 
                     return ServerDto.builder()
                             .id(server.getId())

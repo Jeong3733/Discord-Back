@@ -7,8 +7,8 @@ import discord.api.common.security.JwtTokenProvider;
 import discord.api.common.utils.RedisUtils;
 import discord.api.entity.User;
 import discord.api.entity.VerificationToken;
-import discord.api.entity.dtos.auth.SignUpRequestDto;
-import discord.api.entity.dtos.auth.TokenResponseDto;
+import discord.api.dtos.auth.SignUpRequestDto;
+import discord.api.dtos.auth.TokenResponseDto;
 import discord.api.entity.enums.Role;
 import discord.api.entity.enums.UserStatus;
 import discord.api.repository.User.UserRepository;
@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+//ㅎㅇ
 @RequiredArgsConstructor
 public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;

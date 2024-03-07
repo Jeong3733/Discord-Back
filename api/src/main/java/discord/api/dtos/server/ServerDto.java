@@ -1,4 +1,4 @@
-package discord.api.entity.dtos.server;
+package discord.api.dtos.server;
 
 import jakarta.persistence.Column;
 import lombok.Builder;
