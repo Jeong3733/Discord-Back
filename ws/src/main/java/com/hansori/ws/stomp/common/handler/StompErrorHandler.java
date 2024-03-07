@@ -1,6 +1,10 @@
 package com.hansori.ws.stomp.common.handler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hansori.ws.stomp.dto.response.error.ErrorCode;
+import com.hansori.ws.stomp.dto.response.error.ErrorResponse;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -18,25 +22,41 @@ import java.util.Objects;
 @Slf4j
 public class StompErrorHandler extends StompSubProtocolErrorHandler {
 
-    public StompErrorHandler() {
+    private final ObjectMapper objectMapper;
+
+    public StompErrorHandler(ObjectMapper objectMapper) {
         super();
+        this.objectMapper = objectMapper;
     }
 
 
+    @SneakyThrows
     @Override
     public Message<byte[]> handleClientMessageProcessingError(Message<byte[]> clientMessage, Throwable ex) {
 
 
+        log.error("handleClientMessageProcessingError: {}", ex.getMessage());
+
         final StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.ERROR);
-        accessor.setMessage(ErrorCode.USER_NOT_AUTHORIZED.getMessage());
+        final String errorMessage = createErrorMessage(ErrorCode.USER_NOT_AUTHORIZED);
+
+        accessor.setMessage(errorMessage);
         accessor.setLeaveMutable(true);
 
         setReceiptIdForClient(clientMessage, accessor);
 
         return MessageBuilder.createMessage(
-                ErrorCode.USER_NOT_AUTHORIZED.toString().getBytes(StandardCharsets.UTF_8),
+                errorMessage.getBytes(StandardCharsets.UTF_8),
                 accessor.getMessageHeaders()
         );
+    }
+
+    private String createErrorMessage(final ErrorCode errorCode) throws JsonProcessingException {
+        final ErrorResponse errorResponse = ErrorResponse.builder()
+                .message(errorCode.name())
+                .code(errorCode.getCode())
+                .build();
+        return objectMapper.writeValueAsString(errorResponse);
     }
 
     private void setReceiptIdForClient(final Message<byte[]> clientMessage,

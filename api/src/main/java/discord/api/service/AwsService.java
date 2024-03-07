@@ -1,13 +1,10 @@
 package discord.api.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.*;
 import discord.api.common.exception.ErrorCode;
 import discord.api.common.exception.RestApiException;
+import discord.api.common.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,6 +75,25 @@ public class AwsService {
     }
 
 
+    /**
+     * S3에서 uuid 를 통해서 파일 다운로드
+     *
+     * @param fileName : 다운로드할 파일의 이름
+     * @return S3Object : S3에서 다운로드한 파일 리스트
+     * @throws AmazonS3Exception : S3에서 파일 다운로드 실패 시 예외 발생
+     * @throws IOException       : 파일을 찾을 수 없을 시 예외 발생
+     * @author Baek Seung Jin
+     */
+    public String downloadFile(final String fileName) throws AmazonS3Exception {
+        try(final S3Object s3Object = amazonS3.getObject(bucket, fileName)) {
+            final S3ObjectInputStream objectContent = s3Object.getObjectContent();
+            return FileUtils.inputStreamToBase64(objectContent);
+        } catch (AmazonS3Exception | IOException e) {
+            throw new RestApiException(ErrorCode.AWS_S3_DOWNLOAD_FAIL);
+        }
+    }
+
+
     public void deleteMultipartFile(UUID uuid) throws AmazonS3Exception {
         try {
             amazonS3.deleteObject(bucket, uuid.toString());
@@ -85,4 +101,5 @@ public class AwsService {
             throw new RestApiException(ErrorCode.AWS_S3_DOWNLOAD_FAIL);
         }
     }
+
 }

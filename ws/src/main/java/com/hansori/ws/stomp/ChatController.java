@@ -1,11 +1,14 @@
 package com.hansori.ws.stomp;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hansori.ws.kafka.KafkaConstant;
 import com.hansori.ws.db.mongo.document.ChatMessage;
 import com.hansori.ws.stomp.dto.request.ChatMessageRequestDTO;
 import com.hansori.ws.stomp.dto.response.ChatMessageResponseDTO;
 import com.hansori.ws.stomp.dto.response.error.CustomException;
 import com.hansori.ws.stomp.dto.response.error.ErrorCode;
+import com.hansori.ws.stomp.dto.response.error.ErrorResponse;
 import com.hansori.ws.stomp.service.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,13 +34,8 @@ import static com.hansori.ws.stomp.common.utils.StompUtils.*;
 public class ChatController {
 
     private final ChatMessageService chatMessageService;
-
+    private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, ChatMessage> kafkaTemplate;
-
-    @GetMapping("/chat/{roomId}")
-    public ResponseEntity<Slice<ChatMessageResponseDTO>> getChatMessage(@PathVariable final int roomId, final long chatId) {
-        return ResponseEntity.ok(chatMessageService.findAll(roomId, chatId));
-    }
 
     @MessageMapping("/chat/{roomId}")
     public void message(@DestinationVariable final long roomId, final ChatMessageRequestDTO message, final StompHeaderAccessor stompHeaderAccessor) {
@@ -49,10 +47,18 @@ public class ChatController {
 
     @MessageExceptionHandler
     @SendToUser("/queue/errors")
-    public ErrorCode handleException(final CustomException customException) {
+    public String handleException(final CustomException customException) throws JsonProcessingException {
+        final ErrorCode errorCode = customException.getErrorCode();
 
-        return customException.getErrorCode();
-    }
+        log.error("handleException: {}", errorCode);
+
+        final ErrorResponse errorResponse = ErrorResponse.builder()
+                .message(errorCode.name())
+                .code(errorCode.getCode())
+                .build();
+
+
+        return objectMapper.writeValueAsString(errorResponse);    }
 
 
 
